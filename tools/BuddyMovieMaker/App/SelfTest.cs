@@ -210,7 +210,7 @@ public static class SelfTest
         });
         Test("MML2 limits version and movie bounds",()=>
         {
-            Reject(()=>MmlScore.Compile("MML3\n[N]\nN35"));Reject(()=>MmlScore.Compile("[N]\nN35"));
+            Reject(()=>MmlScore.Compile("MML4\n[N]\nN35"));Reject(()=>MmlScore.Compile("[N]\nN35"));
             Reject(()=>MmlScore.Compile("MML2\n[N]\n"+new string(' ',8192)));
             Reject(()=>MmlScore.Compile("MML2\n[N]\nT240 [["+string.Concat(Enumerable.Repeat("R64 ",65))+"]8]8"));
             Reject(()=>MmlScore.Compile("MML2\n[N]\nT40 [[N35/1 N35/1]8]8"));
@@ -230,6 +230,29 @@ public static class SelfTest
             Reject(()=>MovieEngine.Export(video,null,null,Path.Combine(output,"NOISEBAD"),none,mml:noise,speech:[new(speechFile,300)]).GetAwaiter().GetResult());
             Check(!Directory.Exists(Path.Combine(output,"NOISEBAD")),"Conflict published an export.");
             MovieEngine.Export(video,null,captions,Path.Combine(output,"NOISESP"),none,mml:noiseRest,speech:[new(speechFile,300)]).GetAwaiter().GetResult();
+        });
+        Test("MML3 without P exports legacy video and music",()=>
+        {
+            string source=Path.Combine(output,"NOPIT.MML"),folder=Path.Combine(output,"NOPIT");File.WriteAllText(source,"MML3\n[A]\nO4 C1\n");
+            MovieEngine.Export(video,null,null,folder,none,mml:source).GetAwaiter().GetResult();
+            Check(Encoding.ASCII.GetString(File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZV")),0,4)=="WZV2","No-P video changed.");
+            Check(Encoding.ASCII.GetString(File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZM")),0,4)=="WZM1","No-P music changed.");
+            Check(!File.Exists(Path.Combine(folder,"PIT.REQ"))&&!File.Exists(Path.Combine(folder,"MOVIE.WZP")),"No-P export emitted PIT.");
+        });
+        Test("MML3 PIT export refuses unqualified player before creating destination",()=>
+        {
+            foreach(string body in new[]{"[P]\nO4 C1\n","[P]\nR1\n","[A]\nC1\n[P]\n"})
+            {
+                string source=Path.Combine(output,"PIT.MML"),folder=Path.Combine(output,"PITBLOCKED");File.WriteAllText(source,"MML3\n"+body);
+                Reject(()=>MovieEngine.Export(video,null,null,folder,none,mml:source).GetAwaiter().GetResult());
+                Check(!Directory.Exists(folder),"Unqualified PIT player published an export.");
+            }
+        });
+        Test("MML3 video bytes and silent preview retain exact quantizer",()=>
+        {
+            var info=MovieEngine.Probe(video,none).GetAwaiter().GetResult();string legacy=Path.Combine(output,"OLD.WZV"),pit=Path.Combine(output,"NEW.WZV");
+            MovieEngine.Convert(video,legacy,info,none).GetAwaiter().GetResult();MovieEngine.Convert(video,pit,info,none,pitRequired:true).GetAwaiter().GetResult();
+            var a=File.ReadAllBytes(legacy);var b=File.ReadAllBytes(pit);Check(b[3]=='3',"PIT video version missing.");b[3]=(byte)'2';Check(a.SequenceEqual(b),"PIT video quantizer or metadata differs.");
         });
         string fixtures=Path.Combine(output,"MML-CONFORMANCE");Directory.CreateDirectory(fixtures);
         foreach(var fixture in new[]{("BASIC","[A]\nT120 O4 L4 V12 @KEYS C D\n"),("DOTTED","[A]\nT120 O4 C4. R8 > C8\n"),("CARRIED","[A]\nT121 O4 [C64 R64]8\n"),("PRESETS","[A]\n@PAD O3 C1\n[B]\n@BELL O4 G1\n")})

@@ -170,7 +170,7 @@ public static class MovieEngine
         }
         return cues;
     }
-    public static async Task Convert(string source, string destination, MovieInfo movie, CancellationToken ct, IProgress<double>? progress = null)
+    public static async Task Convert(string source, string destination, MovieInfo movie, CancellationToken ct, IProgress<double>? progress = null,bool pitRequired=false)
     {
         if(movie.DurationMs<=0 || movie.DurationMs>600000 || movie.Frames!=(movie.DurationMs+249)/250 || movie.StartSeconds<0 || (movie.EndSeconds==0 && movie.StartSeconds!=0) || (movie.EndSeconds!=0 && (movie.EndSeconds<=movie.StartSeconds || movie.EndSeconds-movie.StartSeconds>600 || Math.Round((movie.EndSeconds-movie.StartSeconds)*1000)!=movie.DurationMs)))throw new InvalidDataException("Invalid bounded movie profile.");
         var args=new List<string>{"-nostdin", "-hide_banner", "-loglevel", "error", "-protocol_whitelist", "file,pipe"};
@@ -184,7 +184,7 @@ public static class MovieEngine
         var errors = decoder.StandardError.ReadToEndAsync(ct);
         using var file = new FileStream(destination, FileMode.CreateNew, FileAccess.Write);
         using var writer = new BinaryWriter(file);
-        writer.Write(Encoding.ASCII.GetBytes("WZV2")); writer.Write((ushort)Width); writer.Write((ushort)Height); writer.Write((ushort)Fps);
+        writer.Write(Encoding.ASCII.GetBytes(pitRequired?"WZV3":"WZV2")); writer.Write((ushort)Width); writer.Write((ushort)Height); writer.Write((ushort)Fps);
         writer.Write((ushort)24); writer.Write(movie.Frames); writer.Write(movie.DurationMs); writer.Write(FrameBytes);
         byte[] raw = new byte[Width * Height * 3]; byte[]? last = null; int count = 0;
         try
@@ -220,19 +220,26 @@ public static class MovieEngine
         if(!string.IsNullOrWhiteSpace(midi)&&!string.IsNullOrWhiteSpace(mml))throw new InvalidDataException("Choose MIDI or MML as the music source, not both.");
         var expressive=string.IsNullOrWhiteSpace(mml)?null:MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato);
         byte[]? music = expressive?.Music??(string.IsNullOrWhiteSpace(midi) ? null : MidiScore.Convert(midi, info.DurationMs));
-        var clips=await SpeechAudio.Prepare(speech,info.DurationMs,music,ct);
+        var clips=await SpeechAudio.Prepare(speech,info.DurationMs,music,ct,expressive?.Pit);
         string runtime = Path.Combine(AppContext.BaseDirectory, "runtime", "MOVPLAY.EXE");
         if (!File.Exists(runtime)) throw new IOException("Packaged DOS player is missing.");
+        if(expressive?.Pit!=null)
+        {
+            runtime=Path.Combine(AppContext.BaseDirectory,"runtime-mml3","MOVPLAY.EXE");
+            string capability=Path.Combine(AppContext.BaseDirectory,"runtime-mml3","MML3.CAP");
+            if(!File.Exists(runtime)||!File.Exists(capability)||!File.ReadAllBytes(capability).SequenceEqual(Encoding.ASCII.GetBytes("WZP1")))throw new IOException("PIT export requires the qualified MML3 DOS player. This build supports MML3 validation and silent preview; PIT export is pending sound ownership qualification.");
+        }
         string parent = Path.GetDirectoryName(destination) ?? throw new IOException("Choose a destination folder.");
         Directory.CreateDirectory(parent);
         string staging = Path.Combine(parent, ".buddy-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
         try
         {
-            await Convert(video, Path.Combine(staging, "MOVIE.WZV"), info, ct, progress);
+            await Convert(video, Path.Combine(staging, "MOVIE.WZV"), info, ct, progress,expressive?.Pit!=null);
             File.Copy(runtime, Path.Combine(staging, "MOVPLAY.EXE"));
             if (music != null) File.WriteAllBytes(Path.Combine(staging, "MOVIE.WZM"), music);
             if(expressive!=null){File.WriteAllBytes(Path.Combine(staging,"MOVIE.WZI"),expressive.Instruments);File.WriteAllBytes(Path.Combine(staging,"INST.REQ"),Encoding.ASCII.GetBytes("WZI1"));}
+            if(expressive?.Pit!=null){File.WriteAllBytes(Path.Combine(staging,"MOVIE.WZP"),expressive.Pit);File.WriteAllBytes(Path.Combine(staging,"PIT.REQ"),Encoding.ASCII.GetBytes("WZP1"));}
             SpeechAudio.Write(Path.Combine(staging,"SPEECH.PCM"),clips);
             File.WriteAllLines(Path.Combine(staging, "MOVIE.LRC"), cues.Select(c => $"{c.Time}|{c.Text}"), Encoding.ASCII);
             using (var writer = new BinaryWriter(File.Create(Path.Combine(staging, "MOVIE.CUE"))))

@@ -14,7 +14,7 @@ public record SpeechClip(int StartMs,int EndMs,byte[] Samples);
 public static class SpeechAudio
 {
     public const int MaxClips=16,MaxClipMs=8000,MaxSamples=360000,GuardMs=150;
-    public static async Task<List<SpeechClip>> Prepare(IEnumerable<SpeechRequest>? requests,int movieMs,byte[]? music,CancellationToken ct)
+    public static async Task<List<SpeechClip>> Prepare(IEnumerable<SpeechRequest>? requests,int movieMs,byte[]? music,CancellationToken ct,byte[]? pit=null)
     {
         var inputs=requests?.OrderBy(r=>r.StartMs).ToArray()??[];
         if(inputs.Length>MaxClips)throw new InvalidDataException("Maximum 16 speech clips.");
@@ -50,6 +50,7 @@ public static class SpeechAudio
                 if(clips.Count>0 && start<clips[^1].EndMs+GuardMs)throw new InvalidDataException("Speech clips need a 150 ms gap and cannot overlap.");
                 total+=duration*6;if(total>MaxSamples)throw new InvalidDataException("Total speech exceeds 60 seconds / 360,000 samples.");
                 ValidateMusicWindow(music,start,start+duration,movieMs);
+                ValidatePitWindow(pit,start,start+duration,movieMs);
                 byte[] decoded=raw.ToArray(),pwm=new byte[duration*6];
                 for(int i=0;i<pwm.Length;i++)pwm[i]=(byte)(1+Math.Round((i<decoded.Length?decoded[i]:128)*71.0/255,MidpointRounding.ToEven));
                 clips.Add(new(start,start+duration,pwm));
@@ -72,6 +73,19 @@ public static class SpeechAudio
                 throw new InvalidDataException("Speech needs a PSG rest from 150 ms before to 150 ms after the clip. Insert a rest in the MIDI/MML score or move the clip.");
         }
         if(state.Any(n=>n!=0))throw new InvalidDataException("Speech starts during an active PSG note. Insert a rest or move the clip (150 ms guard).");
+    }
+    public static void ValidatePitWindow(byte[]? pit,int start,int end,int duration)
+    {
+        if(pit==null)return;
+        if(pit.Length<32||Encoding.ASCII.GetString(pit,0,4)!="WZP1"||BitConverter.ToUInt16(pit,4)!=1||BitConverter.ToUInt16(pit,6)!=0||BitConverter.ToInt32(pit,8)!=duration||BitConverter.ToUInt16(pit,14)!=0||pit.Length!=16+8*BitConverter.ToUInt16(pit,12))throw new InvalidDataException("Invalid PIT score for speech scheduling.");
+        int low=Math.Max(0,start-GuardMs),high=Math.Min(duration,end+GuardMs);byte held=0;
+        for(int p=16;p<pit.Length;p+=8)
+        {
+            int time=BitConverter.ToInt32(pit,p);
+            if(time<=low)held=pit[p+4];
+            else if(time<high&&pit[p+4]!=0)throw new InvalidDataException("Speech needs a PIT rest from 150 ms before to 150 ms after the clip. Insert a rest in [P] or move the clip.");
+        }
+        if(held!=0)throw new InvalidDataException("Speech guard overlaps an active PIT note. Insert a rest in [P] or move the clip.");
     }
     public static void Write(string destination,IReadOnlyList<SpeechClip> clips)
     {

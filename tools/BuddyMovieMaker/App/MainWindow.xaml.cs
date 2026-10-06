@@ -71,7 +71,7 @@ public partial class MainWindow : Window
     internal void SetSourceForTest(SourceInfo info){sourceInfo=info;SourceLabel.Text=$"Source: {info.DurationSeconds} seconds";UpdateSelection();}
     void MidiBrowse(object sender,RoutedEventArgs e){var path=Browse("MIDI files|*.mid;*.midi");if(path!=null){MidiPath.Text=path;MmlPath.Text="";}}
     void CaptionBrowse(object sender,RoutedEventArgs e){var path=Browse("Caption files|*.txt;*.lrc");if(path!=null)CaptionPath.Text=path;}
-    void MmlBrowse(object sender,RoutedEventArgs e){var path=Browse("MML1 files|*.mml");if(path!=null){MmlPath.Text=path;MidiPath.Text="";}}
+    void MmlBrowse(object sender,RoutedEventArgs e){var path=Browse("MML scores|*.mml");if(path!=null){MmlPath.Text=path;MidiPath.Text="";}}
     void SpeechAdd(object sender,RoutedEventArgs e)
     {
         if(!int.TryParse(SpeechStart.Text,out int time)||time<0){Status.Text="Speech start must be a nonnegative movie time in milliseconds.";return;}
@@ -114,8 +114,9 @@ public partial class MainWindow : Window
             var range=RangeInputs();sourceInfo=await MovieEngine.ProbeSource(source,ct);UpdateSelection();var info=MovieEngine.Select(sourceInfo,range.start,range.end);
             var validated=MovieEngine.Captions(captions,info.DurationMs);
             if(!string.IsNullOrWhiteSpace(midi)&&!string.IsNullOrWhiteSpace(mml))throw new ArgumentException("Choose MIDI or MML, not both.");
-            byte[]? music=!string.IsNullOrWhiteSpace(mml)?MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato).Music:string.IsNullOrWhiteSpace(midi)?null:MidiScore.Convert(midi,info.DurationMs);
-            await SpeechAudio.Prepare(SpeechInputs(),info.DurationMs,music,ct);
+            var expressive=!string.IsNullOrWhiteSpace(mml)?MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato):null;
+            byte[]? music=expressive?.Music??(string.IsNullOrWhiteSpace(midi)?null:MidiScore.Convert(midi,info.DurationMs));
+            await SpeechAudio.Prepare(SpeechInputs(),info.DurationMs,music,ct,expressive?.Pit);
             string folder=Path.Combine(Path.GetTempPath(),"BuddyMaker-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
             bool accepted=false;
             try

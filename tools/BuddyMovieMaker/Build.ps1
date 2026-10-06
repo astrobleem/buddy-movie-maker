@@ -64,6 +64,6 @@ $version=$project.Project.PropertyGroup.RuntimeFrameworkVersion
 Copy-Item (Join-Path $packages "microsoft.netcore.app.runtime.win-x64\$version\LICENSE.TXT") (Join-Path $app 'DOTNET-LICENSE.txt')
 Copy-Item (Join-Path $packages "microsoft.netcore.app.runtime.win-x64\$version\THIRD-PARTY-NOTICES.TXT") (Join-Path $app 'DOTNET-THIRD-PARTY-NOTICES.txt')
 Copy-Item (Join-Path $packages "microsoft.windowsdesktop.app.runtime.win-x64\$version\LICENSE") (Join-Path $app 'WPF-LICENSE.txt')
-Copy-Item (Join-Path $PSScriptRoot 'README.md'),(Join-Path $PSScriptRoot 'DEPENDENCIES.md'),(Join-Path $PSScriptRoot 'MML1.md'),(Join-Path $PSScriptRoot 'MML2.md') $app
+Copy-Item (Join-Path $PSScriptRoot 'README.md'),(Join-Path $PSScriptRoot 'DEPENDENCIES.md'),(Join-Path $PSScriptRoot 'MML1.md'),(Join-Path $PSScriptRoot 'MML2.md'),(Join-Path $PSScriptRoot 'MML3.md') $app
 Copy-Item (Join-Path $PSScriptRoot 'Tests\Mml2Contract') (Join-Path $app 'test-contract') -Recurse
 Write-Output "Decoder-free preview built: $app. Select your existing FFmpeg folder in the app."

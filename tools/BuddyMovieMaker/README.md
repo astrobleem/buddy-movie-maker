@@ -78,6 +78,15 @@ Source media and existing exports are never edited or overwritten.
 
 ## MML and timed speech
 
+The local MML3 stage1 build accepts a first-line `MML3` declaration and an
+optional fifth `[P]` part for PC-speaker pitches 45..96 and `V0`/`V1`. The
+compiler and silent preview use the frozen [MML3.md](MML3.md) contract. Without
+`[P]`, export retains WZV2/WZM1. With explicit `[P]`, including empty or all-rest
+parts, export requires a separately qualified MML3 DOS runtime; stage1 refuses
+that export before creating the destination. Native PIT playback and resource
+ownership arbitration are pending. Do not manually mark an old player as capable.
+The unchanged legacy DOS player remains packaged for existing-format exports.
+
 MML1 accepts three parts `[A]`, `[B]`, `[C]`, notes/rests, tempo/octave/length/
 volume, bounded repeats and eight original WININST12 presets. Choose an initial
 preset and optional eligible-preset vibrato; explicit `@` commands override it.
