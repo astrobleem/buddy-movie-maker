@@ -211,7 +211,7 @@ public static class MovieEngine
         }
         finally { Kill(decoder); }
     }
-    public static async Task Export(string video, string? midi, string? captions, string destination, CancellationToken ct, IProgress<double>? progress = null, IEnumerable<SpeechRequest>? speech = null, string? mml=null,int initialProgram=0,bool vibrato=true,decimal startSeconds=0,decimal? endSeconds=null)
+    public static async Task Export(string video, string? midi, string? captions, string destination, CancellationToken ct, IProgress<double>? progress = null, IEnumerable<SpeechRequest>? speech = null, string? mml=null,int initialProgram=0,bool vibrato=true,decimal startSeconds=0,decimal? endSeconds=null,bool pitEnabled=false)
     {
         destination = Path.GetFullPath(destination);
         if (Directory.Exists(destination) || File.Exists(destination)) throw new IOException("Choose a new folder. Existing destinations are never overwritten.");
@@ -219,6 +219,7 @@ public static class MovieEngine
         var cues = Captions(captions, info.DurationMs);
         if(!string.IsNullOrWhiteSpace(midi)&&!string.IsNullOrWhiteSpace(mml))throw new InvalidDataException("Choose MIDI or MML as the music source, not both.");
         var expressive=string.IsNullOrWhiteSpace(mml)?null:MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato);
+        if(expressive?.Pit!=null&&!pitEnabled)throw new InvalidDataException("This MML3 score requires its PC-speaker [P] voice, including empty or all-rest parts. Enable the PIT voice checkbox to export it.");
         byte[]? music = expressive?.Music??(string.IsNullOrWhiteSpace(midi) ? null : MidiScore.Convert(midi, info.DurationMs));
         var clips=await SpeechAudio.Prepare(speech,info.DurationMs,music,ct,expressive?.Pit);
         string runtime = Path.Combine(AppContext.BaseDirectory, "runtime", "MOVPLAY.EXE");
@@ -244,13 +245,14 @@ public static class MovieEngine
             File.WriteAllLines(Path.Combine(staging, "MOVIE.LRC"), cues.Select(c => $"{c.Time}|{c.Text}"), Encoding.ASCII);
             using (var writer = new BinaryWriter(File.Create(Path.Combine(staging, "MOVIE.CUE"))))
             { writer.Write(Encoding.ASCII.GetBytes("WZC1")); writer.Write(info.DurationMs); writer.Write(0); writer.Write(info.DurationMs); }
-            File.WriteAllText(Path.Combine(staging, "PLAY.BAT"), "@echo off\r\nMOVPLAY\r\n", Encoding.ASCII);
+            File.WriteAllText(Path.Combine(staging, "PLAY.BAT"), "@echo off\r\nMOVPLAY"+(expressive?.Pit!=null?" /P":"")+"\r\n", Encoding.ASCII);
             File.WriteAllText(Path.Combine(staging, "README.TXT"), "Buddy Movie Maker export\r\nCopy this entire folder to a Tandy 1000 running DOS 3+; exit Windows and run PLAY.\r\nEscape or Space stops; run PLAY again to restart.\r\n256x160, 4 fps, standard RGBI. Movie soundtrack is not exported.\r\n" + (expressive != null ? "MML"+expressive.Version+" score: WININST12 tones and fixed noise; keep MOVIE.WZI and INST.REQ beside the player.\r\n" : music != null ? "MIDI arrangement: three melodic PSG voices; percussion omitted.\r\n" : "No PSG music.\r\n") + (clips.Count > 0 ? "Timed PC-speaker speech: video holds and catches up; PSG rests during clips.\r\n" : "No digital speech.\r\n"), Encoding.ASCII);
             File.AppendAllText(Path.Combine(staging,"README.TXT"),$"Source selection: {info.StartSeconds.ToString(CultureInfo.InvariantCulture)} to {info.EndSeconds.ToString(CultureInfo.InvariantCulture)} seconds.\r\nAll music, captions and speech use output movie-relative time zero. Separate tracks are not shifted or cropped from source time.\r\n",Encoding.ASCII);
+            if(expressive?.Pit!=null)File.AppendAllText(Path.Combine(staging,"README.TXT"),"Required PC-speaker [P] voice: keep MOVIE.WZP and PIT.REQ with WZV3/WZM2.\r\nPIT voice was explicitly enabled in Maker; PLAY passes /P. Direct MOVPLAY refuses without /P.\r\nUse a controlled foreground DOS session without other sound/timer writers.\r\nThe cooperative adapter cannot exclude arbitrary TSRs, BIOS beeps or direct-port programs.\r\nPIT and PSG rest throughout speech guards; no saved pitch is restored after PWM.\r\n",Encoding.ASCII);
             var hashes = Directory.GetFiles(staging).ToDictionary(p => Path.GetFileName(p)!, p => System.Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(p))));
             File.WriteAllText(Path.Combine(staging, "MANIFEST.JSON"), JsonSerializer.Serialize(new { version = 1, profile = "256x160@4", duration_ms = info.DurationMs,
                 source_start_seconds=info.StartSeconds,source_end_seconds=info.EndSeconds,sidecar_time_origin="output movie zero; no source-time shifting",
-                frames = info.Frames, palette = "IBM/Tandy RGBI", quantizer = "nearest squared RGB; first index wins ties; no dithering", soundtrack = "omitted",
+                frames = info.Frames, palette = "IBM/Tandy RGBI", quantizer = "nearest squared RGB; first index wins ties; no dithering", soundtrack = "omitted",pit_required=expressive?.Pit!=null,pit_explicitly_enabled=expressive?.Pit!=null&&pitEnabled,
                 music_source=expressive!=null?"MML"+expressive.Version+" WININST12 expressive":music!=null?"MIDI legacy":"none", speech_clips=clips.Count,speech_samples=clips.Sum(c=>c.Samples.Length),speech_policy="PSG rests with 150ms guards; video holds/catches up; movie clock continues", caption_cues = cues.Count, files = hashes }, new JsonSerializerOptions { WriteIndented = true }));
             ct.ThrowIfCancellationRequested();
             Directory.Move(staging, destination); // Atomic publication on same volume; refuses destination races.

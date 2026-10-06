@@ -4,7 +4,8 @@ Native WPF desktop app for Windows 10/11 x64. The self-contained folder includes
 .NET 8.0.31 and a separately built DOS player. It does not require Python
 or a separate .NET installation. FFmpeg is **not included**. You need an existing
 local Windows x64 FFmpeg distribution containing `ffmpeg.exe` and `ffprobe.exe`.
-Run `BuddyMovieMaker.exe` from the extracted folder; keep `runtime/` beside it.
+Run `BuddyMovieMaker.exe` from the extracted folder; keep `runtime/` and
+`runtime-mml3/` beside it.
 
 ## Make a movie
 
@@ -78,14 +79,25 @@ Source media and existing exports are never edited or overwritten.
 
 ## MML and timed speech
 
-The local MML3 stage1 build accepts a first-line `MML3` declaration and an
-optional fifth `[P]` part for PC-speaker pitches 45..96 and `V0`/`V1`. The
-compiler and silent preview use the frozen [MML3.md](MML3.md) contract. Without
-`[P]`, export retains WZV2/WZM1. With explicit `[P]`, including empty or all-rest
-parts, export requires a separately qualified MML3 DOS runtime; stage1 refuses
-that export before creating the destination. Native PIT playback and resource
-ownership arbitration are pending. Do not manually mark an old player as capable.
-The unchanged legacy DOS player remains packaged for existing-format exports.
+MML3 accepts a first-line `MML3` declaration and an optional fifth `[P]` part for
+PC-speaker pitches 45..96 and `V0`/`V1`. See the frozen [MML3.md](MML3.md) contract.
+Without `[P]`, export retains WZV2/WZM1 and the unchanged legacy DOS player.
+Explicit `[P]`, including empty or all-rest parts, requires the **Enable required
+MML3 [P] PC-speaker voice** checkbox, which starts unchecked. Preview stays silent
+and identifies the required lane. The qualified package exports WZV3/WZM2/WZP1,
+`PIT.REQ`, WZI1/`INST.REQ` and the new player together. `PLAY.BAT` passes `/P`;
+direct `MOVPLAY` launch refuses a required voice without that switch. Missing
+runtime capability also refuses export before creating its destination.
+
+The DOS adapter controls one cooperative foreground player. Use a controlled
+DOS session with no other sound/timer writers; it cannot exclude arbitrary TSRs,
+BIOS beeps or unrelated direct-port programs. It refuses Windows and an already
+active speaker before output writes. PSG and PIT rest throughout each guarded
+speech interval. PWM temporarily owns the speaker; resume evaluates current
+movie time rather than restoring a saved pitch. Stop/error/exit releases owned
+output. No resident component, driver installation or system-beep interception
+is added. Native tests cover the actual Windows3 real-mode DOS-child refusal;
+other Windows modes and physical hardware remain unverified.
 
 MML1 accepts three parts `[A]`, `[B]`, `[C]`, notes/rests, tempo/octave/length/
 volume, bounded repeats and eight original WININST12 presets. Choose an initial
@@ -100,7 +112,7 @@ Audio becomes mono 6 kHz PC-speaker PWM using the existing proven playback path.
 Late service skips leading speech samples to preserve the timeline; the slow
 guest fixture started 84 ms late (504 of 2,400 samples skipped). Playback
 quality and timing are therefore approximate. Clips must fit the video, remain
-at least 150 ms apart, and fall in logical PSG
+at least 150 ms apart, and fall in logical PSG (and required PIT)
 rests with 150 ms guards before and after. Conflicting music is rejected.
 There is no TTS or automatic soundtrack transcription. Video holds during each
 clip and catches up afterward while the movie clock continues. Captions update
@@ -129,6 +141,7 @@ has self-expired. The Windows preview remains silent.
 `MOVPLAY.EXE`, `MOVIE.WZV`, `MOVIE.CUE`, `MOVIE.LRC` (possibly empty),
 optional `MOVIE.WZM`, MML-only `MOVIE.WZI` + `INST.REQ`, optional `SPEECH.PCM`,
 `PLAY.BAT`, `README.TXT`, `MANIFEST.JSON`.
+Required MML3 PIT movies also contain `MOVIE.WZP` and `PIT.REQ`.
 All guest names are DOS 8.3. The manifest records the conversion profile,
 duration, frame count, optional-track status and SHA-256 of exported files.
 The generic player uses these filenames and no fixed Buddy speech windows.
@@ -149,6 +162,7 @@ nothing and does not download or copy a decoder into the deliverable.
 ```powershell
 .\tools\BuddyMovieMaker\Build.ps1 -ToolchainRoot C:\path\dos-toolchain -Output C:\path\new-build
 # Optional portable SDK: add -Dotnet C:\path\sdk\dotnet.exe
+# Concurrent workers must all pass -EmulatorLock C:\path\shared-emulator.lock.
 # Self-test uses only a synthetic FFmpeg pattern, tiny authored MIDI/captions.
 Start-Process C:\path\new-build\BuddyMovieMaker\BuddyMovieMaker.exe `
   -ArgumentList '--self-test','C:\path\new-test-output','C:\path\existing-ffmpeg\bin' -Wait
@@ -175,6 +189,30 @@ inside PWM and replay. Build the test-only injector and run the additional suite
 The injector stays in disposable DOSBox guests; it is never shipped in runtime/.
 Cycle budgets are emulator stress settings, not a calibrated 4.77 MHz 8088.
 These tests do not certify perceived audio or real hardware.
+
+MML3 builds both isolated runtimes. A `Tests/QualifiedMml3Runtime.json` receipt
+must match the newly built MML3 executable and accepted native test counts before
+Build creates its `MML3.CAP` capability file. A missing receipt leaves PIT export
+disabled; a mismatched receipt fails the build. Do not copy a capability marker
+onto another executable. The reviewed adapter source and cooperative-session
+scope are documented in `RuntimeMml3/ADAPTER.md` in source and
+`runtime-mml3/ADAPTER.md` in the packaged app.
+
+```powershell
+.\tools\BuddyMovieMaker\Tests\CheckMml3Compiler.ps1 `
+  -Assembly C:\path\new-build\BuddyMovieMaker\BuddyMovieMaker.dll `
+  -Output C:\path\new-compiler-report.json
+.\tools\BuddyMovieMaker\Tests\Mml3Runtime.ps1 `
+  -Runtime C:\path\new-build\dos-mml3\MOVPLAY.EXE `
+  -Output C:\path\new-mml3-runtime-tests -Lock C:\path\shared-emulator.lock
+```
+
+The MML3 suite checks all 56 frozen bundles in enabled/disabled movie/audio modes
+(224 decisions). Advanced tests cover actual Maker exports and speech, Escape,
+replay, an already busy speaker, the maximum 600-second container and held-note
+late seek. Those timing checks play the final second and a half-second range;
+they do not certify a full ten-minute wall-clock run. Captured independent SPKR
+and TANDY tracks verify emulator output; physical audio remains unverified.
 
 Noise qualification additionally uses the six shared MML2 binary fixtures and
 thirteen invalid-source fixtures, plus all47 hardware mappings, repeated-hit

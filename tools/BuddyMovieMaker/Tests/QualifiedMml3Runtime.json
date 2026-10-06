@@ -1,0 +1,14 @@
+{
+  "limits": "No physical hardware, human-listening certification or full ten-minute wall-clock run",
+  "contract": "MML3/PIT revision1",
+  "native_scope": "DOSBox-X 8086_prefetch Tandy 640KiB/3000 cycles; enabled/disabled movie/audio, guarded actual PWM, Escape, replay, unowned speaker busy refusal, 600-second container tail and held-note seek",
+  "contract_spec_sha256": "C47A115B936F67C21665A5C542CF1F0B1684DEEF3809E21C21BBCFEAF2860768",
+  "windows_child_pass": true,
+  "qualification_date": "2026-10-06",
+  "adapter_source_commit": "ad8c62a539d33805ec27226c941e5bb5d312a8e3",
+  "native_corpus_checks": 224,
+  "windows_scope": "Windows3 real-mode DOS-child refusal; other modes unverified",
+  "advanced_checks": 9,
+  "ownership_scope": "One cooperative foreground player; cannot exclude arbitrary TSRs, BIOS beeps or unregistered direct port writers",
+  "runtime_mml3_sha256": "FF5D679C725B07E647CF0335509D5AA55F017BE1302F074DB0A419CFFEB1B3A7"
+}

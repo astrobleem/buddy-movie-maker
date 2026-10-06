@@ -122,10 +122,10 @@ public partial class MainWindow : Window
             try
             {
                 var progress=new Progress<double>(v=>Progress.Value=v);
-                await Task.Run(()=>MovieEngine.Convert(source,Path.Combine(folder,"MOVIE.WZV"),info,ct,progress),ct);
+                await Task.Run(()=>MovieEngine.Convert(source,Path.Combine(folder,"MOVIE.WZV"),info,ct,progress,expressive?.Pit!=null),ct);
                 ct.ThrowIfCancellationRequested();DeletePreview();previewFolder=folder;preview=Path.Combine(folder,"MOVIE.WZV");movie=info;cues=validated;accepted=true;
                 Timeline.Maximum=info.Frames-1;Timeline.Value=0;Timeline.IsEnabled=PlayButton.IsEnabled=true;Placeholder.Visibility=Visibility.Collapsed;ShowFrame(0);
-                Status.Text=$"Ready: {info.DurationMs/1000.0:0.00}s, {info.Frames} frames. "+(info.HasAudio?"Video soundtrack omitted. ":"")+"Export uses the same conversion.";
+                Status.Text=$"Ready: {info.DurationMs/1000.0:0.00}s, {info.Frames} frames. "+(info.HasAudio?"Video soundtrack omitted. ":"")+"Export uses the same conversion. "+(expressive?.Pit!=null?"Required [P] voice: silent preview; enable its checkbox for export.":"");
             }
             finally{if(!accepted)Directory.Delete(folder,true);}
         });
@@ -136,13 +136,14 @@ public partial class MainWindow : Window
         if(dialog.ShowDialog(this)!=true)return;
         string source=VideoPath.Text,midi=MidiPath.Text,captions=CaptionPath.Text,destination=dialog.FileName,mml=MmlPath.Text;
         int initialProgram=PresetBox.SelectedIndex*16;bool vibrato=VibratoBox.IsChecked==true;
+        bool pitEnabled=PitBox.IsChecked==true;
         await Run(async ct=>
         {
             Status.Text="Converting and assembling your movie folder…";
             var progress=new Progress<double>(v=>Progress.Value=v);
             var clips=SpeechInputs();
             var range=RangeInputs();sourceInfo=await MovieEngine.ProbeSource(source,ct);UpdateSelection();MovieEngine.Select(sourceInfo,range.start,range.end);
-            await Task.Run(()=>MovieEngine.Export(source,midi,captions,destination,ct,progress,clips,mml,initialProgram,vibrato,range.start,range.end),ct);
+            await Task.Run(()=>MovieEngine.Export(source,midi,captions,destination,ct,progress,clips,mml,initialProgram,vibrato,range.start,range.end,pitEnabled),ct);
             Status.Text="Export complete: "+destination+". Copy the whole folder and run PLAY on your Tandy.";
         });
     }

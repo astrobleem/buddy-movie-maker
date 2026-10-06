@@ -9,3 +9,12 @@ tools/BuddyMovieMaker/Tests/Mml2Contract/* -text
 tools/BuddyMovieMaker/Tests/Mml3Contract/** -text
 notices/* -text
 tools/BuddyMovieMaker/MML3.md -text
+tools/BuddyMovieMaker/RuntimeMml3/*.C text eol=crlf
+tools/BuddyMovieMaker/RuntimeMml3/*.H text eol=crlf
+tools/BuddyMovieMaker/RuntimeMml3/*.ASM text eol=crlf
+tools/BuddyMovieMaker/RuntimeMml3/*.BAT text eol=crlf
+# Sound adapter handoff files retain their reviewed bytes.
+tools/BuddyMovieMaker/RuntimeMml3/DOSSND.C -text whitespace=cr-at-eol
+tools/BuddyMovieMaker/RuntimeMml3/DOSSND.H -text whitespace=cr-at-eol
+tools/BuddyMovieMaker/RuntimeMml3/DOSGUARD.H -text whitespace=cr-at-eol
+tools/BuddyMovieMaker/RuntimeMml3/win30/DRIVER/PITCORE.H -text whitespace=cr-at-eol
