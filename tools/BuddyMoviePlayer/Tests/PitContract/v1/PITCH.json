@@ -1,0 +1,262 @@
+[
+  {
+    "note": 45,
+    "hz": 110,
+    "divisor": 10847
+  },
+  {
+    "note": 46,
+    "hz": 117,
+    "divisor": 10198
+  },
+  {
+    "note": 47,
+    "hz": 123,
+    "divisor": 9701
+  },
+  {
+    "note": 48,
+    "hz": 131,
+    "divisor": 9108
+  },
+  {
+    "note": 49,
+    "hz": 139,
+    "divisor": 8584
+  },
+  {
+    "note": 50,
+    "hz": 147,
+    "divisor": 8117
+  },
+  {
+    "note": 51,
+    "hz": 156,
+    "divisor": 7649
+  },
+  {
+    "note": 52,
+    "hz": 165,
+    "divisor": 7231
+  },
+  {
+    "note": 53,
+    "hz": 175,
+    "divisor": 6818
+  },
+  {
+    "note": 54,
+    "hz": 185,
+    "divisor": 6450
+  },
+  {
+    "note": 55,
+    "hz": 196,
+    "divisor": 6088
+  },
+  {
+    "note": 56,
+    "hz": 208,
+    "divisor": 5736
+  },
+  {
+    "note": 57,
+    "hz": 220,
+    "divisor": 5424
+  },
+  {
+    "note": 58,
+    "hz": 233,
+    "divisor": 5121
+  },
+  {
+    "note": 59,
+    "hz": 247,
+    "divisor": 4831
+  },
+  {
+    "note": 60,
+    "hz": 262,
+    "divisor": 4554
+  },
+  {
+    "note": 61,
+    "hz": 277,
+    "divisor": 4308
+  },
+  {
+    "note": 62,
+    "hz": 294,
+    "divisor": 4058
+  },
+  {
+    "note": 63,
+    "hz": 311,
+    "divisor": 3837
+  },
+  {
+    "note": 64,
+    "hz": 330,
+    "divisor": 3616
+  },
+  {
+    "note": 65,
+    "hz": 349,
+    "divisor": 3419
+  },
+  {
+    "note": 66,
+    "hz": 370,
+    "divisor": 3225
+  },
+  {
+    "note": 67,
+    "hz": 392,
+    "divisor": 3044
+  },
+  {
+    "note": 68,
+    "hz": 415,
+    "divisor": 2875
+  },
+  {
+    "note": 69,
+    "hz": 440,
+    "divisor": 2712
+  },
+  {
+    "note": 70,
+    "hz": 466,
+    "divisor": 2560
+  },
+  {
+    "note": 71,
+    "hz": 494,
+    "divisor": 2415
+  },
+  {
+    "note": 72,
+    "hz": 523,
+    "divisor": 2281
+  },
+  {
+    "note": 73,
+    "hz": 554,
+    "divisor": 2154
+  },
+  {
+    "note": 74,
+    "hz": 587,
+    "divisor": 2033
+  },
+  {
+    "note": 75,
+    "hz": 622,
+    "divisor": 1918
+  },
+  {
+    "note": 76,
+    "hz": 659,
+    "divisor": 1811
+  },
+  {
+    "note": 77,
+    "hz": 698,
+    "divisor": 1709
+  },
+  {
+    "note": 78,
+    "hz": 740,
+    "divisor": 1612
+  },
+  {
+    "note": 79,
+    "hz": 784,
+    "divisor": 1522
+  },
+  {
+    "note": 80,
+    "hz": 831,
+    "divisor": 1436
+  },
+  {
+    "note": 81,
+    "hz": 880,
+    "divisor": 1356
+  },
+  {
+    "note": 82,
+    "hz": 932,
+    "divisor": 1280
+  },
+  {
+    "note": 83,
+    "hz": 988,
+    "divisor": 1208
+  },
+  {
+    "note": 84,
+    "hz": 1047,
+    "divisor": 1140
+  },
+  {
+    "note": 85,
+    "hz": 1109,
+    "divisor": 1076
+  },
+  {
+    "note": 86,
+    "hz": 1175,
+    "divisor": 1015
+  },
+  {
+    "note": 87,
+    "hz": 1245,
+    "divisor": 958
+  },
+  {
+    "note": 88,
+    "hz": 1319,
+    "divisor": 905
+  },
+  {
+    "note": 89,
+    "hz": 1397,
+    "divisor": 854
+  },
+  {
+    "note": 90,
+    "hz": 1480,
+    "divisor": 806
+  },
+  {
+    "note": 91,
+    "hz": 1568,
+    "divisor": 761
+  },
+  {
+    "note": 92,
+    "hz": 1661,
+    "divisor": 718
+  },
+  {
+    "note": 93,
+    "hz": 1760,
+    "divisor": 678
+  },
+  {
+    "note": 94,
+    "hz": 1865,
+    "divisor": 640
+  },
+  {
+    "note": 95,
+    "hz": 1976,
+    "divisor": 604
+  },
+  {
+    "note": 96,
+    "hz": 2093,
+    "divisor": 570
+  }
+]
