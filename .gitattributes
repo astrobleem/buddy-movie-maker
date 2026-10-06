@@ -6,4 +6,6 @@ tools/BuddyMovieMaker/Runtime/*.ASM text eol=crlf
 tools/BuddyMovieMaker/Runtime/*.BAT text eol=crlf
 # Authoritative fixtures and third-party notices retain their original bytes.
 tools/BuddyMovieMaker/Tests/Mml2Contract/* -text
+tools/BuddyMovieMaker/Tests/Mml3Contract/** -text
 notices/* -text
+tools/BuddyMovieMaker/MML3.md -text
