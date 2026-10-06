@@ -252,9 +252,16 @@ DOSBox guests. Test injectors/harness executables are not app runtime files.
 
 ## Distribution status
 
-This is a qualified **decoder-free test build**. See
+This is a qualified **decoder-free experimental test build**. See
 [DEPENDENCIES.md](DEPENDENCIES.md) for provenance, notices and licensing.
 The executable is unsigned; respect Windows security warnings. The package
 does not contain FFmpeg binaries, so it does not redistribute that dependency.
 The prerequisite trades the original one-folder experience for a responsible
 deliverable without an incomplete FFmpeg corresponding-source bundle.
+
+The source PR's Windows CI compiles the self-contained Maker and checks the
+frozen contract plus production compiler; it does not build or certify the DOS
+player, install a proprietary toolchain, run the native UI, or publish binaries.
+The native DOS and host-export qualification above is separate local evidence.
+End-to-end manual media-dialog, keyboard and focus acceptance remains pending;
+automated host tests and WPF screenshots do not qualify every desktop UI path.

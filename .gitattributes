@@ -6,7 +6,8 @@ tools/BuddyMovieMaker/Runtime/*.ASM text eol=crlf
 tools/BuddyMovieMaker/Runtime/*.BAT text eol=crlf
 # Authoritative fixtures and third-party notices retain their original bytes.
 tools/BuddyMovieMaker/Tests/Mml2Contract/* -text
-tools/BuddyMovieMaker/Tests/Mml3Contract/** -text
+# Frozen CRLF and malformed-source blank lines are part of the hashed corpus.
+tools/BuddyMovieMaker/Tests/Mml3Contract/** -text whitespace=cr-at-eol,-blank-at-eof
 notices/* -text
 tools/BuddyMovieMaker/MML3.md -text
 tools/BuddyMovieMaker/RuntimeMml3/*.C text eol=crlf
