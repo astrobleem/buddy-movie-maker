@@ -71,7 +71,7 @@ public partial class MainWindow : Window
     internal void SetSourceForTest(SourceInfo info){sourceInfo=info;SourceLabel.Text=$"Source: {info.DurationSeconds} seconds";UpdateSelection();}
     void MidiBrowse(object sender,RoutedEventArgs e){var path=Browse("MIDI files|*.mid;*.midi");if(path!=null){MidiPath.Text=path;MmlPath.Text="";}}
     void CaptionBrowse(object sender,RoutedEventArgs e){var path=Browse("Caption files|*.txt;*.lrc");if(path!=null)CaptionPath.Text=path;}
-    void MmlBrowse(object sender,RoutedEventArgs e){var path=Browse("MML1 files|*.mml");if(path!=null){MmlPath.Text=path;MidiPath.Text="";}}
+    void MmlBrowse(object sender,RoutedEventArgs e){var path=Browse("MML scores|*.mml");if(path!=null){MmlPath.Text=path;MidiPath.Text="";}}
     void SpeechAdd(object sender,RoutedEventArgs e)
     {
         if(!int.TryParse(SpeechStart.Text,out int time)||time<0){Status.Text="Speech start must be a nonnegative movie time in milliseconds.";return;}
@@ -114,17 +114,18 @@ public partial class MainWindow : Window
             var range=RangeInputs();sourceInfo=await MovieEngine.ProbeSource(source,ct);UpdateSelection();var info=MovieEngine.Select(sourceInfo,range.start,range.end);
             var validated=MovieEngine.Captions(captions,info.DurationMs);
             if(!string.IsNullOrWhiteSpace(midi)&&!string.IsNullOrWhiteSpace(mml))throw new ArgumentException("Choose MIDI or MML, not both.");
-            byte[]? music=!string.IsNullOrWhiteSpace(mml)?MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato).Music:string.IsNullOrWhiteSpace(midi)?null:MidiScore.Convert(midi,info.DurationMs);
-            await SpeechAudio.Prepare(SpeechInputs(),info.DurationMs,music,ct);
+            var expressive=!string.IsNullOrWhiteSpace(mml)?MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato):null;
+            byte[]? music=expressive?.Music??(string.IsNullOrWhiteSpace(midi)?null:MidiScore.Convert(midi,info.DurationMs));
+            await SpeechAudio.Prepare(SpeechInputs(),info.DurationMs,music,ct,expressive?.Pit);
             string folder=Path.Combine(Path.GetTempPath(),"BuddyMaker-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
             bool accepted=false;
             try
             {
                 var progress=new Progress<double>(v=>Progress.Value=v);
-                await Task.Run(()=>MovieEngine.Convert(source,Path.Combine(folder,"MOVIE.WZV"),info,ct,progress),ct);
+                await Task.Run(()=>MovieEngine.Convert(source,Path.Combine(folder,"MOVIE.WZV"),info,ct,progress,expressive?.Pit!=null),ct);
                 ct.ThrowIfCancellationRequested();DeletePreview();previewFolder=folder;preview=Path.Combine(folder,"MOVIE.WZV");movie=info;cues=validated;accepted=true;
                 Timeline.Maximum=info.Frames-1;Timeline.Value=0;Timeline.IsEnabled=PlayButton.IsEnabled=true;Placeholder.Visibility=Visibility.Collapsed;ShowFrame(0);
-                Status.Text=$"Ready: {info.DurationMs/1000.0:0.00}s, {info.Frames} frames. "+(info.HasAudio?"Video soundtrack omitted. ":"")+"Export uses the same conversion.";
+                Status.Text=$"Ready: {info.DurationMs/1000.0:0.00}s, {info.Frames} frames. "+(info.HasAudio?"Video soundtrack omitted. ":"")+"Export uses the same conversion. "+(expressive?.Pit!=null?"Required [P] voice: silent preview; enable its checkbox for export.":"");
             }
             finally{if(!accepted)Directory.Delete(folder,true);}
         });
@@ -135,13 +136,14 @@ public partial class MainWindow : Window
         if(dialog.ShowDialog(this)!=true)return;
         string source=VideoPath.Text,midi=MidiPath.Text,captions=CaptionPath.Text,destination=dialog.FileName,mml=MmlPath.Text;
         int initialProgram=PresetBox.SelectedIndex*16;bool vibrato=VibratoBox.IsChecked==true;
+        bool pitEnabled=PitBox.IsChecked==true;
         await Run(async ct=>
         {
             Status.Text="Converting and assembling your movie folder…";
             var progress=new Progress<double>(v=>Progress.Value=v);
             var clips=SpeechInputs();
             var range=RangeInputs();sourceInfo=await MovieEngine.ProbeSource(source,ct);UpdateSelection();MovieEngine.Select(sourceInfo,range.start,range.end);
-            await Task.Run(()=>MovieEngine.Export(source,midi,captions,destination,ct,progress,clips,mml,initialProgram,vibrato,range.start,range.end),ct);
+            await Task.Run(()=>MovieEngine.Export(source,midi,captions,destination,ct,progress,clips,mml,initialProgram,vibrato,range.start,range.end,pitEnabled),ct);
             Status.Text="Export complete: "+destination+". Copy the whole folder and run PLAY on your Tandy.";
         });
     }
