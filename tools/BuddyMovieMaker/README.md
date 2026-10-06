@@ -211,8 +211,26 @@ The MML3 suite checks all 56 frozen bundles in enabled/disabled movie/audio mode
 (224 decisions). Advanced tests cover actual Maker exports and speech, Escape,
 replay, an already busy speaker, the maximum 600-second container and held-note
 late seek. Those timing checks play the final second and a half-second range;
-they do not certify a full ten-minute wall-clock run. Captured independent SPKR
-and TANDY tracks verify emulator output; physical audio remains unverified.
+the separate full-length test plays all 600 seconds. On 2026-10-06 it completed
+in 601.664 wall seconds with all 2,400 frames rendered, zero frame drops and
+all eight PIT records applied. Speech at 596.3 seconds began 20 ms late and
+skipped 120 elapsed samples; final PSG/PIT notes and cleanup completed. This
+attests DOSBox-X normal/8086_prefetch, Tandy, 640 KiB and fixed 3,000 cycles,
+not calibrated physical hardware speed. The full run disables host sound;
+captured independent SPKR and TANDY tracks from separate short tests verify
+emulator output. Physical audio and human listening remain unverified.
+
+```powershell
+.\tools\BuddyMovieMaker\Tests\Mml3FullLength.ps1 `
+  -Assembly C:\path\new-build\BuddyMovieMaker\BuddyMovieMaker.dll `
+  -Runtime C:\path\new-build\dos-mml3\MOVPLAY.EXE `
+  -Speech C:\path\host-tests\PITSPEAK\SPEECH.PCM `
+  -Output C:\path\new-full-length-tests -Lock C:\path\shared-emulator.lock
+```
+
+This generated fixture takes about ten minutes, holds the shared emulator lock,
+and bounds its own emulator process at 750 seconds. Use the generated qualified
+400 ms/2,400-sample speech fixture; no user media is required.
 
 Noise qualification additionally uses the six shared MML2 binary fixtures and
 thirteen invalid-source fixtures, plus all47 hardware mappings, repeated-hit
