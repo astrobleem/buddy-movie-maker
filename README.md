@@ -25,6 +25,19 @@ Built Windows packages include .NET and need no Python or separate .NET install.
 FFmpeg is supplied separately; this source repository includes no release binaries.
 See the [full guide](tools/BuddyMovieMaker/README.md) for exact profiles and limits.
 
+## Windows x64 playback
+
+The [Buddy Movie Player](tools/BuddyMoviePlayer/README.md) opens exported Buddy
+movies on Windows 10/11 x64, including legacy 64x48 and Maker 256x160 WZV2 files.
+It supports WZM/WZI music, captions and timed speech, with play/pause, seeking,
+replay, volume and fullscreen. Its self-contained EXE requires no separate .NET,
+Python, FFmpeg or DOS installation. Build it separately with
+`tools/BuddyMoviePlayer/Build.ps1 -Output <new-directory>`.
+
+This is the modern **64-bit** companion to the original **16-bit Windows 3.0**
+player listed in oemsound-tandy. Host PSG synthesis follows the format's score
+and instrument semantics; physical Tandy sound fidelity is not certified.
+
 ## Build and test
 
 Prerequisites: Windows x64, PowerShell, .NET SDK 8.0.425 (tested), DOSBox-X, and a
