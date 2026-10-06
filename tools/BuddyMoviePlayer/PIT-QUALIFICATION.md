@@ -54,6 +54,8 @@ keyboard shortcuts and listening remains required. No global audio/settings,
 raw ports, DOS driver, PIT0/1, IRQ or security changes were made.
 
 The player does not parse MML; the corpus's 17 invalid MML authoring sources are
-Maker checks. No new remote write, PR promotion, merge or Cloudflare action was
-performed for this PIT candidate. The previous public draft player PR remains
-the approved baseline. Publication/integration is coordinated by the parent.
+Maker checks. These observations qualified the local candidate before source
+publication. Experimental source is published separately as a draft stacked on
+player PR #1; it does not replace the approved baseline or release a binary.
+No merge or Cloudflare action is authorized. Production Maker interoperability
+is recorded separately in INTEROP-QUALIFICATION.md.
