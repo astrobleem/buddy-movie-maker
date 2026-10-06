@@ -1,0 +1,41 @@
+<Window x:Class="BuddyMovieMaker.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Buddy Movie Maker" Width="1120" Height="850" MinWidth="950" MinHeight="700" Background="#101925" Foreground="#EEF3FC" FontFamily="Segoe UI" WindowStartupLocation="CenterScreen">
+ <Grid Margin="30,20">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <StackPanel Margin="0,0,0,26"><TextBlock Text="BUDDY / MOVIE MAKER" Foreground="#58DDB2" FontWeight="SemiBold" FontSize="13"/><TextBlock Text="A little movie. A lot of Tandy." FontSize="30" FontWeight="SemiBold" Margin="0,9,0,5"/><TextBlock Text="Turn your video into a ready-to-copy DOS movie folder." Foreground="#A7B7CC" FontSize="15"/></StackPanel>
+  <Grid Grid.Row="1" Margin="0,42,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="420"/><ColumnDefinition Width="28"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <ScrollViewer x:Name="InputsScroll" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="Inputs">
+    <TextBlock Text="01   CHOOSE YOUR VIDEO" FontSize="13" FontWeight="SemiBold" Foreground="#58DDB2"/>
+    <DockPanel><Button DockPanel.Dock="Right" Content="Browse…" Click="VideoBrowse"/><TextBox x:Name="VideoPath" IsReadOnly="True" AutomationProperties.Name="Video file"/></DockPanel>
+    <TextBlock Text="Export up to 10 minutes • 256 × 160 • 4 frames/sec" Foreground="#A7B7CC"/>
+    <TextBlock x:Name="SourceLabel" Text="Source duration appears after choosing video." Foreground="#A7B7CC" Margin="0,8,0,0"/>
+    <StackPanel Orientation="Horizontal" Margin="0,5,0,0"><TextBlock Text="Start (s)" VerticalAlignment="Center"/><TextBox x:Name="TrimStart" Text="0" Width="85" Margin="8,0,12,0" TextChanged="RangeChanged" AutomationProperties.Name="Source start seconds"/><TextBlock Text="End (s)" VerticalAlignment="Center"/><TextBox x:Name="TrimEnd" Width="100" Margin="8,0,0,0" TextChanged="RangeChanged" AutomationProperties.Name="Source end seconds; blank means end of video"/></StackPanel>
+    <TextBlock Text="Source seconds, e.g. 12.5. Blank end = end of video." Foreground="#A7B7CC" FontSize="12"/>
+    <TextBlock x:Name="SelectionLabel" Text="Choose a video to set the range." TextWrapping="Wrap" Foreground="#58DDB2"/>
+    <TextBlock Text="Music, captions and speech start at output movie time 0. Source trim does not shift or crop these separate tracks." Foreground="#A7B7CC" FontSize="12" TextWrapping="Wrap" Margin="0,5,0,0"/>
+    <TextBlock Text="02   OPTIONAL EXTRAS" FontSize="13" FontWeight="SemiBold" Foreground="#58DDB2" Margin="0,28,0,8"/>
+    <TextBlock Text="MIDI score"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse…" Click="MidiBrowse"/><TextBox x:Name="MidiPath" AutomationProperties.Name="Optional MIDI file"/></DockPanel>
+    <TextBlock Text="Three melodic PSG voices. Percussion, pitch bend and expression are omitted. Notes must be 45–96. No automatic soundtrack transcription." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/>
+    <TextBlock Text="MML score (alternative to MIDI)" Margin="0,10,0,0"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse…" Click="MmlBrowse"/><TextBox x:Name="MmlPath" AutomationProperties.Name="Optional MML file"/></DockPanel>
+    <StackPanel Orientation="Horizontal"><ComboBox x:Name="PresetBox" Width="140" SelectedIndex="0"><ComboBoxItem>KEYS</ComboBoxItem><ComboBoxItem>ORGAN</ComboBoxItem><ComboBoxItem>BASS</ComboBoxItem><ComboBoxItem>PAD</ComboBoxItem><ComboBoxItem>REED</ComboBoxItem><ComboBoxItem>LEAD</ComboBoxItem><ComboBoxItem>BELL</ComboBoxItem><ComboBoxItem>HIT</ComboBoxItem></ComboBox><CheckBox x:Name="VibratoBox" Content="Eligible preset vibrato" IsChecked="True" Margin="12,0" VerticalAlignment="Center"/></StackPanel>
+    <TextBlock Text="MML1 tones, or first-line MML2 with [N] drums (N35/16). Three tones + fixed noise, original WININST12 curves. Initial preset above; @ overrides tones. Preview stays silent." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12" Margin="0,5,0,0"/>
+    <TextBlock Text="Captions (.txt or .lrc)" Margin="0,18,0,0"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse…" Click="CaptionBrowse"/><TextBox x:Name="CaptionPath" AutomationProperties.Name="Optional captions file"/></DockPanel>
+    <TextBlock Text="One cue per line: milliseconds|text. Up to 256 cues, 52 characters each. Leave captions empty for a caption-free movie." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/>
+    <TextBlock Text="03   TIMED DIGITAL SPEECH" FontSize="13" FontWeight="SemiBold" Foreground="#58DDB2" Margin="0,18,0,5"/>
+    <StackPanel Orientation="Horizontal"><TextBlock Text="Start ms:" VerticalAlignment="Center"/><TextBox x:Name="SpeechStart" Text="0" Width="70" Margin="8,0"/><Button Content="Add audio clip…" Click="SpeechAdd" Margin="0"/><Button Content="Remove" Click="SpeechRemove" Margin="8,0,0,0"/></StackPanel>
+    <DataGrid x:Name="SpeechGrid" AutoGenerateColumns="False" CanUserAddRows="False" Height="105" Margin="0,8,0,4" Background="#172334" Foreground="#101925" SelectionMode="Single"><DataGrid.Columns><DataGridTextColumn Header="Start ms" Binding="{Binding StartMs, UpdateSourceTrigger=LostFocus}" Width="80"/><DataGridTextColumn Header="Audio file" Binding="{Binding FileName}" IsReadOnly="True" Width="300"/></DataGrid.Columns></DataGrid>
+    <TextBlock Text="WAV / MP3 / FLAC / OGG / M4A. Each ≤8s, ≤16 clips, ≤60s total. PSG must rest with 150ms guards. Video holds during speech; clock continues. User audio only." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/>
+    <Button x:Name="PreviewButton" Content="Build Tandy preview" Click="PreviewClick" Margin="0,15,0,0" HorizontalAlignment="Left" Background="#315C7C"/>
+   </StackPanel></ScrollViewer>
+   <StackPanel Grid.Column="2">
+    <Border Background="#080C12" BorderBrush="#304057" BorderThickness="1" Padding="8"><Grid Height="320"><Image x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/><TextBlock x:Name="Placeholder" Text="YOUR TANDY PREMIERE STARTS HERE" FontSize="13" Foreground="#7890AA" VerticalAlignment="Center" HorizontalAlignment="Center"/></Grid></Border>
+    <Slider x:Name="Timeline" Minimum="0" Maximum="0" ValueChanged="Seek" Margin="0,15,0,0" IsEnabled="False" SmallChange="1" IsSnapToTickEnabled="True" TickFrequency="1" AutomationProperties.Name="Converted frame"/>
+    <DockPanel><TextBlock x:Name="FrameLabel" Text="Converted frames will appear here" Foreground="#A7B7CC" VerticalAlignment="Center"/><Button DockPanel.Dock="Right" Content="Play / Pause" Click="PlayClick" x:Name="PlayButton" IsEnabled="False"/></DockPanel>
+    <TextBlock x:Name="CaptionLabel" Foreground="#58DDB2" TextWrapping="Wrap" Margin="0,4"/>
+    <TextBlock Text="Preview displays the exact packed video pixels used in export. Captions below show the cue text; DOS draws them in its bottom caption strip." Foreground="#A7B7CC" TextWrapping="Wrap" FontSize="12" Margin="0,10,0,0"/>
+   </StackPanel>
+  </Grid>
+  <DockPanel Grid.Row="1" VerticalAlignment="Top"><Button x:Name="DecoderButton" Content="Choose existing FFmpeg…" Click="DecoderBrowse" DockPanel.Dock="Left" Margin="0,0,12,0"/><TextBlock x:Name="DecoderLabel" Text="Choose FFmpeg once; the saved folder and ffprobe are checked on launch. Supplied separately." VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/></DockPanel>
+  <StackPanel Grid.Row="2" Margin="0,20,0,0"><ProgressBar x:Name="Progress" Height="4" Maximum="1" Foreground="#58DDB2" Background="#27364A"/><DockPanel Margin="0,14,0,0"><StackPanel DockPanel.Dock="Right" Orientation="Horizontal"><Button x:Name="CancelButton" Content="Cancel" IsEnabled="False" Click="CancelClick"/><Button x:Name="ExportButton" Content="Export movie folder…" Click="ExportClick" Background="#58DDB2" Foreground="#101925" FontWeight="SemiBold"/></StackPanel><TextBlock x:Name="Status" Text="Choose an existing FFmpeg folder, then a local video. Everything stays on this computer." TextWrapping="Wrap" MaxWidth="620" VerticalAlignment="Center" Foreground="#A7B7CC"/></DockPanel></StackPanel>
+ </Grid>
+</Window>

@@ -1,0 +1,16 @@
+{
+  "upstream_repository": "https://github.com/astrobleem/oemsound-tandy",
+  "upstream_revision": "b25d5bce188cf63a3eb7a5ae9bab68147a862cd2",
+  "maker_source_revision": "9d03c5db75f627e7851f266697227badb261d0a6",
+  "scope": "tools/BuddyMovieMaker source, shared synthetic conformance fixtures, standalone documentation and external-toolchain build adapters",
+  "license": "GPL-3.0",
+  "excludes": [
+    "original Git history",
+    "movie/user media",
+    "personal settings and evidence",
+    "Microsoft toolchain/SDK/runtime binaries",
+    "FFmpeg binaries",
+    "legacy Buddy assets"
+  ],
+  "platform": "Windows x64 WPF; portable converter/CLI not implemented"
+}

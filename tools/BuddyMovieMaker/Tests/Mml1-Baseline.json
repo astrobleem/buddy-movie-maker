@@ -1,0 +1,67 @@
+{
+  "source_commit": "886dc441d52fdf275557f81e87db1911e3f1a9ac",
+  "contract": "MML1 + WZM1 + WZI1 WININST12 0x0102",
+  "scope": "Original four shared conformance fixtures; exact byte compatibility before adding noise syntax.",
+  "files": [
+    {
+      "name": "BASIC.MML",
+      "size": 29,
+      "sha256": "23FB9EF970E01F9E497DE63654976CC572A68EC081964CE8C0EC515B29E7B3DB"
+    },
+    {
+      "name": "BASIC.WZI",
+      "size": 28,
+      "sha256": "E1C6FBFB3F74AB72BC90DDE29298C29D17778FE7802F930BFE484394D339345F"
+    },
+    {
+      "name": "BASIC.WZM",
+      "size": 62,
+      "sha256": "1A1073AD225EF7C597D71428B32E5B3B107F386E89C9CD9D2E04314FD5BFC06B"
+    },
+    {
+      "name": "CARRIED.MML",
+      "size": 23,
+      "sha256": "81D7F0BBD99B4F102FD8D205AA254D0DFFEC68C27D91C0CE91B59DC117AF52C4"
+    },
+    {
+      "name": "CARRIED.WZI",
+      "size": 28,
+      "sha256": "BA72DCF38FDA19B1F2B2AB78AEC29DC83DB9924BD9560B436DDF1533BFE6871A"
+    },
+    {
+      "name": "CARRIED.WZM",
+      "size": 258,
+      "sha256": "9FEC9084F37A8A534FB1E7963306B3AB4E15510A0F685567155C1D3876875368"
+    },
+    {
+      "name": "DOTTED.MML",
+      "size": 24,
+      "sha256": "AA154E28F3D35E50809FDB89AD1F19F3225353DB083304E803CAB182046796E1"
+    },
+    {
+      "name": "DOTTED.WZI",
+      "size": 28,
+      "sha256": "BFF91787BFB0B9F468A89192612A171C6B23ABDD538095BEA6B1095DF0C336CE"
+    },
+    {
+      "name": "DOTTED.WZM",
+      "size": 76,
+      "sha256": "4C17BDBC3F45E501A9AB1BD02FE014E4ADB4D9B1DD1B6B95B4F8E7EE322933AC"
+    },
+    {
+      "name": "PRESETS.MML",
+      "size": 31,
+      "sha256": "D8FFFA96C57DE9849773472BF25BF819A414ED06DD2CE781C0B0F591371ACBB1"
+    },
+    {
+      "name": "PRESETS.WZI",
+      "size": 28,
+      "sha256": "3C4EADDCA1A107FBAFBD0F0D50850584FA184CEAE4AAD0780F8DBE5240328311"
+    },
+    {
+      "name": "PRESETS.WZM",
+      "size": 48,
+      "sha256": "F12AC2F8F99F492C6CAFC2D7B00C2F9FFAAFE2F3E71FA1BD7AC45CE5B03CD67E"
+    }
+  ]
+}

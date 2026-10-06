@@ -1,0 +1,9 @@
+* text=auto
+*.ps1 text eol=crlf
+tools/BuddyMovieMaker/Runtime/*.C text eol=crlf
+tools/BuddyMovieMaker/Runtime/*.H text eol=crlf
+tools/BuddyMovieMaker/Runtime/*.ASM text eol=crlf
+tools/BuddyMovieMaker/Runtime/*.BAT text eol=crlf
+# Authoritative fixtures and third-party notices retain their original bytes.
+tools/BuddyMovieMaker/Tests/Mml2Contract/* -text
+notices/* -text

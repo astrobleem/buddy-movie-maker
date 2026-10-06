@@ -1,0 +1,5 @@
+Authoritative shared MML2 revision 1 contract and synthetic conformance fixtures.
+Original archive: MML2-Shared-Spec-Conformance.zip, 11,646 bytes.
+Archive SHA256: E292D10DC7C01CBC5AF19D3BC71EF95D0105AD0B609758274BAEACC7686AF3A2.
+Exact MML/WZM/WZI fixtures and invalid-source examples retained unchanged.
+MML2.md at the Maker root records the authoritative specification.
