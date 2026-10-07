@@ -4,7 +4,8 @@ Native WPF desktop app for Windows 10/11 x64. The self-contained folder includes
 .NET 8.0.31 and a separately built DOS player. It does not require Python
 or a separate .NET installation. FFmpeg is **not included**. You need an existing
 local Windows x64 FFmpeg distribution containing `ffmpeg.exe` and `ffprobe.exe`.
-Run `BuddyMovieMaker.exe` from the extracted folder; keep `runtime/` beside it.
+Run `BuddyMovieMaker.exe` from the extracted folder; keep `runtime/` and
+`runtime-mml3/` beside it.
 
 ## Make a movie
 
@@ -59,10 +60,14 @@ Source media and existing exports are never edited or overwritten.
   but Maker emits this one profile only.
 - MIDI format 0/1, PPQN, 1–64 tracks, ≤4 MiB, ≤100,000 parsed relevant events,
   ≤10,000 exported states. Melodic notes must be 45–96. Three melodic PSG voices;
-  highest velocity wins excess polyphony, with channel/note tie order. Sustain
-  and all-notes-off are supported. Channel 10 percussion, programs, pitch bend,
-  expression and other controllers are omitted. Repeated overlapping same-note
-  MIDI voices collapse to one note. No MIDI synthesis in the Windows preview.
+  highest velocity wins excess polyphony, with channel/note/track tie order.
+  Sustain and channel all-notes-off are supported. GM channel 10 keys35..81 use
+  one fixed-noise lane; unknown drum keys refuse before export. Noise collisions
+  and GM timbre reductions are reported in MIDI-REPORT.JSON; losing hits are
+  never queued or replayed later. Programs, pitch bend, expression and other
+  ignored messages are counted. Same-note overlap within one track/channel
+  collapses to one note; different tracks keep separate note ownership.
+  No MIDI synthesis in the Windows preview. See [MIDI-DRUMS.md](MIDI-DRUMS.md).
 - MIDI timeline (including end-of-track) must fit video, with 250 ms tolerance
   for rounding. It starts at movie time zero. A shorter score becomes silent
   after its note-offs; cleanup always mutes PSG at movie end. All exported WZM
@@ -78,12 +83,35 @@ Source media and existing exports are never edited or overwritten.
 
 ## MML and timed speech
 
+MML3 accepts a first-line `MML3` declaration and an optional fifth `[P]` part for
+PC-speaker pitches 45..96 and `V0`/`V1`. See the frozen [MML3.md](MML3.md) contract.
+Without `[P]`, export retains WZV2/WZM1 and the unchanged legacy DOS player.
+Explicit `[P]`, including empty or all-rest parts, requires the **Enable required
+MML3 [P] PC-speaker voice** checkbox, which starts unchecked. Preview stays silent
+and identifies the required lane. The qualified package exports WZV3/WZM2/WZP1,
+`PIT.REQ`, WZI1/`INST.REQ` and the new player together. `PLAY.BAT` passes `/P`;
+direct `MOVPLAY` launch refuses a required voice without that switch. Missing
+runtime capability also refuses export before creating its destination.
+
+The DOS adapter controls one cooperative foreground player. Use a controlled
+DOS session with no other sound/timer writers; it cannot exclude arbitrary TSRs,
+BIOS beeps or unrelated direct-port programs. It refuses Windows and an already
+active speaker before output writes. PSG and PIT rest throughout each guarded
+speech interval. PWM temporarily owns the speaker; resume evaluates current
+movie time rather than restoring a saved pitch. Stop/error/exit releases owned
+output. No resident component, driver installation or system-beep interception
+is added. Native tests cover the actual Windows3 real-mode DOS-child refusal;
+other Windows modes and physical hardware remain unverified.
+
 MML1 accepts three parts `[A]`, `[B]`, `[C]`, notes/rests, tempo/octave/length/
 volume, bounded repeats and eight original WININST12 presets. Choose an initial
 preset and optional eligible-preset vibrato; explicit `@` commands override it.
 See [MML1.md](MML1.md) for exact syntax, timing, limits and shared conformance.
-MIDI keeps the established plain PSG mapping; MML uses the original WININST12
-55 ms envelope engine. A later preset command does not change a held note.
+Tone-only MIDI keeps the established plain PSG mapping. MIDI with drums uses
+constant Organ tones plus original WININST12 noise envelopes and the qualified
+sound-owned player. MML uses the original WININST12 55 ms envelope engine.
+A later preset command does not change a held note. Cue-scoped held-note fades
+are modeled separately and are not exported until consumers agree a gain stream.
 
 Add local WAV/MP3/FLAC/OGG/M4A/AAC clips and edit their start times in milliseconds.
 Maximum 16 clips, 8 seconds each, 60 seconds total, 64 MiB per source file.
@@ -91,7 +119,7 @@ Audio becomes mono 6 kHz PC-speaker PWM using the existing proven playback path.
 Late service skips leading speech samples to preserve the timeline; the slow
 guest fixture started 84 ms late (504 of 2,400 samples skipped). Playback
 quality and timing are therefore approximate. Clips must fit the video, remain
-at least 150 ms apart, and fall in logical PSG
+at least 150 ms apart, and fall in logical PSG (and required PIT)
 rests with 150 ms guards before and after. Conflicting music is rejected.
 There is no TTS or automatic soundtrack transcription. Video holds during each
 clip and catches up afterward while the movie clock continues. Captions update
@@ -111,7 +139,7 @@ The existing WZM1/WZI1 formats and INST.REQ marker are unchanged. The new
 MOVPLAY supports their fourth-slot noise with the original WININST12 curves.
 Older Maker parsers reject MML2 text and older expressive players reject these
 noise records; keep the newly exported player in every updated movie folder.
-MML1 songs remain byte-compatible. MIDI percussion remains omitted. Logical
+MML1 songs remain byte-compatible. MIDI percussion uses the same map. Logical
 noise must rest throughout the same150ms speech guards even after its envelope
 has self-expired. The Windows preview remains silent.
 
@@ -120,6 +148,7 @@ has self-expired. The Windows preview remains silent.
 `MOVPLAY.EXE`, `MOVIE.WZV`, `MOVIE.CUE`, `MOVIE.LRC` (possibly empty),
 optional `MOVIE.WZM`, MML-only `MOVIE.WZI` + `INST.REQ`, optional `SPEECH.PCM`,
 `PLAY.BAT`, `README.TXT`, `MANIFEST.JSON`.
+Required MML3 PIT movies also contain `MOVIE.WZP` and `PIT.REQ`.
 All guest names are DOS 8.3. The manifest records the conversion profile,
 duration, frame count, optional-track status and SHA-256 of exported files.
 The generic player uses these filenames and no fixed Buddy speech windows.
@@ -140,6 +169,7 @@ nothing and does not download or copy a decoder into the deliverable.
 ```powershell
 .\tools\BuddyMovieMaker\Build.ps1 -ToolchainRoot C:\path\dos-toolchain -Output C:\path\new-build
 # Optional portable SDK: add -Dotnet C:\path\sdk\dotnet.exe
+# Concurrent workers must all pass -EmulatorLock C:\path\shared-emulator.lock.
 # Self-test uses only a synthetic FFmpeg pattern, tiny authored MIDI/captions.
 Start-Process C:\path\new-build\BuddyMovieMaker\BuddyMovieMaker.exe `
   -ArgumentList '--self-test','C:\path\new-test-output','C:\path\existing-ffmpeg\bin' -Wait
@@ -167,6 +197,48 @@ The injector stays in disposable DOSBox guests; it is never shipped in runtime/.
 Cycle budgets are emulator stress settings, not a calibrated 4.77 MHz 8088.
 These tests do not certify perceived audio or real hardware.
 
+MML3 builds both isolated runtimes. A `Tests/QualifiedMml3Runtime.json` receipt
+must match the newly built MML3 executable and accepted native test counts before
+Build creates its `MML3.CAP` capability file. A missing receipt leaves PIT export
+disabled; a mismatched receipt fails the build. Do not copy a capability marker
+onto another executable. The reviewed adapter source and cooperative-session
+scope are documented in `RuntimeMml3/ADAPTER.md` in source and
+`runtime-mml3/ADAPTER.md` in the packaged app.
+
+```powershell
+.\tools\BuddyMovieMaker\Tests\CheckMml3Compiler.ps1 `
+  -Assembly C:\path\new-build\BuddyMovieMaker\BuddyMovieMaker.dll `
+  -Output C:\path\new-compiler-report.json
+.\tools\BuddyMovieMaker\Tests\Mml3Runtime.ps1 `
+  -Runtime C:\path\new-build\dos-mml3\MOVPLAY.EXE `
+  -Output C:\path\new-mml3-runtime-tests -Lock C:\path\shared-emulator.lock
+```
+
+The MML3 suite checks all 56 frozen bundles in enabled/disabled movie/audio modes
+(224 decisions). Advanced tests cover actual Maker exports and speech, Escape,
+replay, an already busy speaker, the maximum 600-second container and held-note
+late seek. Those timing checks play the final second and a half-second range;
+the separate full-length test plays all 600 seconds. On 2026-10-06 it completed
+in 601.664 wall seconds with all 2,400 frames rendered, zero frame drops and
+all eight PIT records applied. Speech at 596.3 seconds began 20 ms late and
+skipped 120 elapsed samples; final PSG/PIT notes and cleanup completed. This
+attests DOSBox-X normal/8086_prefetch, Tandy, 640 KiB and fixed 3,000 cycles,
+not calibrated physical hardware speed. The full run disables host sound;
+captured independent SPKR and TANDY tracks from separate short tests verify
+emulator output. Physical audio and human listening remain unverified.
+
+```powershell
+.\tools\BuddyMovieMaker\Tests\Mml3FullLength.ps1 `
+  -Assembly C:\path\new-build\BuddyMovieMaker\BuddyMovieMaker.dll `
+  -Runtime C:\path\new-build\dos-mml3\MOVPLAY.EXE `
+  -Speech C:\path\host-tests\PITSPEAK\SPEECH.PCM `
+  -Output C:\path\new-full-length-tests -Lock C:\path\shared-emulator.lock
+```
+
+This generated fixture takes about ten minutes, holds the shared emulator lock,
+and bounds its own emulator process at 750 seconds. Use the generated qualified
+400 ms/2,400-sample speech fixture; no user media is required.
+
 Noise qualification additionally uses the six shared MML2 binary fixtures and
 thirteen invalid-source fixtures, plus all47 hardware mappings, repeated-hit
 reset, original envelope expiry, third-tone isolation, direct late catch-up,
@@ -187,9 +259,16 @@ DOSBox guests. Test injectors/harness executables are not app runtime files.
 
 ## Distribution status
 
-This is a qualified **decoder-free test build**. See
+This is a qualified **decoder-free experimental test build**. See
 [DEPENDENCIES.md](DEPENDENCIES.md) for provenance, notices and licensing.
 The executable is unsigned; respect Windows security warnings. The package
 does not contain FFmpeg binaries, so it does not redistribute that dependency.
 The prerequisite trades the original one-folder experience for a responsible
 deliverable without an incomplete FFmpeg corresponding-source bundle.
+
+The source PR's Windows CI compiles the self-contained Maker and checks the
+frozen contract plus production compiler; it does not build or certify the DOS
+player, install a proprietary toolchain, run the native UI, or publish binaries.
+The native DOS and host-export qualification above is separate local evidence.
+End-to-end manual media-dialog, keyboard and focus acceptance remains pending;
+automated host tests and WPF screenshots do not qualify every desktop UI path.

@@ -170,7 +170,7 @@ public static class MovieEngine
         }
         return cues;
     }
-    public static async Task Convert(string source, string destination, MovieInfo movie, CancellationToken ct, IProgress<double>? progress = null)
+    public static async Task Convert(string source, string destination, MovieInfo movie, CancellationToken ct, IProgress<double>? progress = null,bool pitRequired=false)
     {
         if(movie.DurationMs<=0 || movie.DurationMs>600000 || movie.Frames!=(movie.DurationMs+249)/250 || movie.StartSeconds<0 || (movie.EndSeconds==0 && movie.StartSeconds!=0) || (movie.EndSeconds!=0 && (movie.EndSeconds<=movie.StartSeconds || movie.EndSeconds-movie.StartSeconds>600 || Math.Round((movie.EndSeconds-movie.StartSeconds)*1000)!=movie.DurationMs)))throw new InvalidDataException("Invalid bounded movie profile.");
         var args=new List<string>{"-nostdin", "-hide_banner", "-loglevel", "error", "-protocol_whitelist", "file,pipe"};
@@ -184,7 +184,7 @@ public static class MovieEngine
         var errors = decoder.StandardError.ReadToEndAsync(ct);
         using var file = new FileStream(destination, FileMode.CreateNew, FileAccess.Write);
         using var writer = new BinaryWriter(file);
-        writer.Write(Encoding.ASCII.GetBytes("WZV2")); writer.Write((ushort)Width); writer.Write((ushort)Height); writer.Write((ushort)Fps);
+        writer.Write(Encoding.ASCII.GetBytes(pitRequired?"WZV3":"WZV2")); writer.Write((ushort)Width); writer.Write((ushort)Height); writer.Write((ushort)Fps);
         writer.Write((ushort)24); writer.Write(movie.Frames); writer.Write(movie.DurationMs); writer.Write(FrameBytes);
         byte[] raw = new byte[Width * Height * 3]; byte[]? last = null; int count = 0;
         try
@@ -211,7 +211,7 @@ public static class MovieEngine
         }
         finally { Kill(decoder); }
     }
-    public static async Task Export(string video, string? midi, string? captions, string destination, CancellationToken ct, IProgress<double>? progress = null, IEnumerable<SpeechRequest>? speech = null, string? mml=null,int initialProgram=0,bool vibrato=true,decimal startSeconds=0,decimal? endSeconds=null)
+    public static async Task Export(string video, string? midi, string? captions, string destination, CancellationToken ct, IProgress<double>? progress = null, IEnumerable<SpeechRequest>? speech = null, string? mml=null,int initialProgram=0,bool vibrato=true,decimal startSeconds=0,decimal? endSeconds=null,bool pitEnabled=false)
     {
         destination = Path.GetFullPath(destination);
         if (Directory.Exists(destination) || File.Exists(destination)) throw new IOException("Choose a new folder. Existing destinations are never overwritten.");
@@ -219,32 +219,44 @@ public static class MovieEngine
         var cues = Captions(captions, info.DurationMs);
         if(!string.IsNullOrWhiteSpace(midi)&&!string.IsNullOrWhiteSpace(mml))throw new InvalidDataException("Choose MIDI or MML as the music source, not both.");
         var expressive=string.IsNullOrWhiteSpace(mml)?null:MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato);
-        byte[]? music = expressive?.Music??(string.IsNullOrWhiteSpace(midi) ? null : MidiScore.Convert(midi, info.DurationMs));
-        var clips=await SpeechAudio.Prepare(speech,info.DurationMs,music,ct);
+        if(expressive?.Pit!=null&&!pitEnabled)throw new InvalidDataException("This MML3 score requires its PC-speaker [P] voice, including empty or all-rest parts. Enable the PIT voice checkbox to export it.");
+        var midiArrangement=string.IsNullOrWhiteSpace(midi)?null:MidiScore.Arrange(midi,info.DurationMs);
+        byte[]? music = expressive?.Music??midiArrangement?.Music;
+        var clips=await SpeechAudio.Prepare(speech,info.DurationMs,music,ct,expressive?.Pit);
         string runtime = Path.Combine(AppContext.BaseDirectory, "runtime", "MOVPLAY.EXE");
         if (!File.Exists(runtime)) throw new IOException("Packaged DOS player is missing.");
+        if(expressive?.Pit!=null||midiArrangement?.Instruments!=null)
+        {
+            runtime=Path.Combine(AppContext.BaseDirectory,"runtime-mml3","MOVPLAY.EXE");
+            string capability=Path.Combine(AppContext.BaseDirectory,"runtime-mml3","MML3.CAP");
+            if(!File.Exists(runtime)||!File.Exists(capability)||!File.ReadAllBytes(capability).SequenceEqual(Encoding.ASCII.GetBytes("WZP1")))throw new IOException("Required PIT or expressive MIDI drums need the qualified sound-owned DOS player and capability receipt. Export is unavailable in this package.");
+        }
         string parent = Path.GetDirectoryName(destination) ?? throw new IOException("Choose a destination folder.");
         Directory.CreateDirectory(parent);
         string staging = Path.Combine(parent, ".buddy-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
         try
         {
-            await Convert(video, Path.Combine(staging, "MOVIE.WZV"), info, ct, progress);
+            await Convert(video, Path.Combine(staging, "MOVIE.WZV"), info, ct, progress,expressive?.Pit!=null);
             File.Copy(runtime, Path.Combine(staging, "MOVPLAY.EXE"));
             if (music != null) File.WriteAllBytes(Path.Combine(staging, "MOVIE.WZM"), music);
             if(expressive!=null){File.WriteAllBytes(Path.Combine(staging,"MOVIE.WZI"),expressive.Instruments);File.WriteAllBytes(Path.Combine(staging,"INST.REQ"),Encoding.ASCII.GetBytes("WZI1"));}
+            else if(midiArrangement?.Instruments!=null){File.WriteAllBytes(Path.Combine(staging,"MOVIE.WZI"),midiArrangement.Instruments);File.WriteAllBytes(Path.Combine(staging,"INST.REQ"),Encoding.ASCII.GetBytes("WZI1"));}
+            if(midiArrangement!=null)File.WriteAllText(Path.Combine(staging,"MIDI-REPORT.JSON"),JsonSerializer.Serialize(new{midiArrangement.Report,policy="3 melodic voices; 1 fixed noise voice; GM 35..81 reduced by existing MML2 map, not GM timbre fidelity; strongest velocity wins, then kick/snare/hat/other, track and note; discarded drums are never queued or resurrected; no tone-C clock sharing; MIDI attack velocities unchanged; CC volume/expression not applied; held-note fades require coordinated gain stream"},new JsonSerializerOptions{WriteIndented=true}));
+            if(expressive?.Pit!=null){File.WriteAllBytes(Path.Combine(staging,"MOVIE.WZP"),expressive.Pit);File.WriteAllBytes(Path.Combine(staging,"PIT.REQ"),Encoding.ASCII.GetBytes("WZP1"));}
             SpeechAudio.Write(Path.Combine(staging,"SPEECH.PCM"),clips);
             File.WriteAllLines(Path.Combine(staging, "MOVIE.LRC"), cues.Select(c => $"{c.Time}|{c.Text}"), Encoding.ASCII);
             using (var writer = new BinaryWriter(File.Create(Path.Combine(staging, "MOVIE.CUE"))))
             { writer.Write(Encoding.ASCII.GetBytes("WZC1")); writer.Write(info.DurationMs); writer.Write(0); writer.Write(info.DurationMs); }
-            File.WriteAllText(Path.Combine(staging, "PLAY.BAT"), "@echo off\r\nMOVPLAY\r\n", Encoding.ASCII);
-            File.WriteAllText(Path.Combine(staging, "README.TXT"), "Buddy Movie Maker export\r\nCopy this entire folder to a Tandy 1000 running DOS 3+; exit Windows and run PLAY.\r\nEscape or Space stops; run PLAY again to restart.\r\n256x160, 4 fps, standard RGBI. Movie soundtrack is not exported.\r\n" + (expressive != null ? "MML"+expressive.Version+" score: WININST12 tones and fixed noise; keep MOVIE.WZI and INST.REQ beside the player.\r\n" : music != null ? "MIDI arrangement: three melodic PSG voices; percussion omitted.\r\n" : "No PSG music.\r\n") + (clips.Count > 0 ? "Timed PC-speaker speech: video holds and catches up; PSG rests during clips.\r\n" : "No digital speech.\r\n"), Encoding.ASCII);
+            File.WriteAllText(Path.Combine(staging, "PLAY.BAT"), "@echo off\r\nMOVPLAY"+(expressive?.Pit!=null?" /P":"")+"\r\n", Encoding.ASCII);
+            File.WriteAllText(Path.Combine(staging, "README.TXT"), "Buddy Movie Maker export\r\nCopy this entire folder to a Tandy 1000 running DOS 3+; exit Windows and run PLAY.\r\nEscape or Space stops; run PLAY again to restart.\r\n256x160, 4 fps, standard RGBI. Movie soundtrack is not exported.\r\n" + (expressive != null ? "MML"+expressive.Version+" score: WININST12 tones and fixed noise; keep MOVIE.WZI and INST.REQ beside the player.\r\n" : music != null ? "MIDI arrangement: three melodic PSG voices and one fixed-noise drum voice. See MIDI-REPORT.JSON for mapping, collisions and unsupported synthesis features.\r\n"+(midiArrangement?.Instruments!=null?"Keep MOVIE.WZI and INST.REQ for constant Organ tones and original MML2 noise envelopes.\r\n":"") : "No PSG music.\r\n") + (clips.Count > 0 ? "Timed PC-speaker speech: video holds and catches up; PSG rests during clips.\r\n" : "No digital speech.\r\n"), Encoding.ASCII);
             File.AppendAllText(Path.Combine(staging,"README.TXT"),$"Source selection: {info.StartSeconds.ToString(CultureInfo.InvariantCulture)} to {info.EndSeconds.ToString(CultureInfo.InvariantCulture)} seconds.\r\nAll music, captions and speech use output movie-relative time zero. Separate tracks are not shifted or cropped from source time.\r\n",Encoding.ASCII);
+            if(expressive?.Pit!=null)File.AppendAllText(Path.Combine(staging,"README.TXT"),"Required PC-speaker [P] voice: keep MOVIE.WZP and PIT.REQ with WZV3/WZM2.\r\nPIT voice was explicitly enabled in Maker; PLAY passes /P. Direct MOVPLAY refuses without /P.\r\nUse a controlled foreground DOS session without other sound/timer writers.\r\nThe cooperative adapter cannot exclude arbitrary TSRs, BIOS beeps or direct-port programs.\r\nPIT and PSG rest throughout speech guards; no saved pitch is restored after PWM.\r\n",Encoding.ASCII);
             var hashes = Directory.GetFiles(staging).ToDictionary(p => Path.GetFileName(p)!, p => System.Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(p))));
             File.WriteAllText(Path.Combine(staging, "MANIFEST.JSON"), JsonSerializer.Serialize(new { version = 1, profile = "256x160@4", duration_ms = info.DurationMs,
                 source_start_seconds=info.StartSeconds,source_end_seconds=info.EndSeconds,sidecar_time_origin="output movie zero; no source-time shifting",
-                frames = info.Frames, palette = "IBM/Tandy RGBI", quantizer = "nearest squared RGB; first index wins ties; no dithering", soundtrack = "omitted",
-                music_source=expressive!=null?"MML"+expressive.Version+" WININST12 expressive":music!=null?"MIDI legacy":"none", speech_clips=clips.Count,speech_samples=clips.Sum(c=>c.Samples.Length),speech_policy="PSG rests with 150ms guards; video holds/catches up; movie clock continues", caption_cues = cues.Count, files = hashes }, new JsonSerializerOptions { WriteIndented = true }));
+                frames = info.Frames, palette = "IBM/Tandy RGBI", quantizer = "nearest squared RGB; first index wins ties; no dithering", soundtrack = "omitted",pit_required=expressive?.Pit!=null,pit_explicitly_enabled=expressive?.Pit!=null&&pitEnabled,
+                music_source=expressive!=null?"MML"+expressive.Version+" WININST12 expressive":music!=null?"MIDI three-tone/fixed-noise":"none", speech_clips=clips.Count,speech_samples=clips.Sum(c=>c.Samples.Length),speech_policy="PSG rests with 150ms guards; video holds/catches up; movie clock continues", caption_cues = cues.Count, files = hashes }, new JsonSerializerOptions { WriteIndented = true }));
             ct.ThrowIfCancellationRequested();
             Directory.Move(staging, destination); // Atomic publication on same volume; refuses destination races.
         }

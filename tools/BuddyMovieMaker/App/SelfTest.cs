@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -38,7 +39,12 @@ public static class SelfTest
             File.Copy(Path.Combine(selected,"ffmpeg.exe"),Path.Combine(alternate,"ffmpeg.exe"));File.Copy(Path.Combine(selected,"ffprobe.exe"),Path.Combine(alternate,"ffprobe.exe"));
             using(var changed=Launch("save",Path.Combine(output,"SETTINGS-ALTERNATE.json"),alternate))Check(changed.RootElement.GetProperty("decoder").GetString()==alternate,"Alternate not selected.");
             using(var restored=Launch("restore",Path.Combine(output,"SETTINGS-ALTERNATE-RESTORE.json"),selected))Check(restored.RootElement.GetProperty("decoder").GetString()==alternate,"Alternate not remembered.");
-            string before=File.ReadAllText(settings);File.Delete(Path.Combine(alternate,"ffprobe.exe"));
+            // Model a remembered folder that became incomplete without deleting a
+            // decoder executable. The complete alternate clone stays untouched.
+            string incomplete=Path.Combine(output,"INCOMPLETE-DECODER");Directory.CreateDirectory(incomplete);
+            File.Copy(Path.Combine(selected,"ffmpeg.exe"),Path.Combine(incomplete,"ffmpeg.exe"));
+            File.WriteAllText(settings,JsonSerializer.Serialize(new{Version=1,DecoderDirectory=incomplete}));
+            string before=File.ReadAllText(settings);
             using(var missing=Launch("restore",Path.Combine(output,"SETTINGS-MISSING.json"),selected))Check(missing.RootElement.GetProperty("decoder").ValueKind==JsonValueKind.Null&&missing.RootElement.GetProperty("status").GetString()!.Contains("unavailable"),"Missing pair did not fall back.");
             Check(File.ReadAllText(settings)==before,"Failed restore overwrote saved selection.");
             using(var recovery=Launch("save",Path.Combine(output,"SETTINGS-RECOVERY.json"),selected))Check(recovery.RootElement.GetProperty("decoder").GetString()==selected,"Reselection failed.");
@@ -210,7 +216,7 @@ public static class SelfTest
         });
         Test("MML2 limits version and movie bounds",()=>
         {
-            Reject(()=>MmlScore.Compile("MML3\n[N]\nN35"));Reject(()=>MmlScore.Compile("[N]\nN35"));
+            Reject(()=>MmlScore.Compile("MML4\n[N]\nN35"));Reject(()=>MmlScore.Compile("[N]\nN35"));
             Reject(()=>MmlScore.Compile("MML2\n[N]\n"+new string(' ',8192)));
             Reject(()=>MmlScore.Compile("MML2\n[N]\nT240 [["+string.Concat(Enumerable.Repeat("R64 ",65))+"]8]8"));
             Reject(()=>MmlScore.Compile("MML2\n[N]\nT40 [[N35/1 N35/1]8]8"));
@@ -231,6 +237,63 @@ public static class SelfTest
             Check(!Directory.Exists(Path.Combine(output,"NOISEBAD")),"Conflict published an export.");
             MovieEngine.Export(video,null,captions,Path.Combine(output,"NOISESP"),none,mml:noiseRest,speech:[new(speechFile,300)]).GetAwaiter().GetResult();
         });
+        Test("MML3 without P exports legacy video and music",()=>
+        {
+            string source=Path.Combine(output,"NOPIT.MML"),folder=Path.Combine(output,"NOPIT");File.WriteAllText(source,"MML3\n[A]\nO4 C1\n");
+            MovieEngine.Export(video,null,null,folder,none,mml:source).GetAwaiter().GetResult();
+            Check(Encoding.ASCII.GetString(File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZV")),0,4)=="WZV2","No-P video changed.");
+            Check(Encoding.ASCII.GetString(File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZM")),0,4)=="WZM1","No-P music changed.");
+            Check(!File.Exists(Path.Combine(folder,"PIT.REQ"))&&!File.Exists(Path.Combine(folder,"MOVIE.WZP")),"No-P export emitted PIT.");
+        });
+        Test("MML3 PIT export requires explicit enable before creating destination",()=>
+        {
+            foreach(string body in new[]{"[P]\nO4 C1\n","[P]\nR1\n","[A]\nC1\n[P]\n"})
+            {
+                string source=Path.Combine(output,"PIT.MML"),folder=Path.Combine(output,"PITBLOCKED");File.WriteAllText(source,"MML3\n"+body);
+                Reject(()=>MovieEngine.Export(video,null,null,folder,none,mml:source).GetAwaiter().GetResult());
+                Check(!Directory.Exists(folder),"Disabled PIT voice published an export.");
+            }
+        });
+        Test("MML3 video bytes and silent preview retain exact quantizer",()=>
+        {
+            var info=MovieEngine.Probe(video,none).GetAwaiter().GetResult();string legacy=Path.Combine(output,"OLD.WZV"),pit=Path.Combine(output,"NEW.WZV");
+            MovieEngine.Convert(video,legacy,info,none).GetAwaiter().GetResult();MovieEngine.Convert(video,pit,info,none,pitRequired:true).GetAwaiter().GetResult();
+            var a=File.ReadAllBytes(legacy);var b=File.ReadAllBytes(pit);Check(b[3]=='3',"PIT video version missing.");b[3]=(byte)'2';Check(a.SequenceEqual(b),"PIT video quantizer or metadata differs.");
+        });
+        if(File.Exists(Path.Combine(AppContext.BaseDirectory,"runtime-mml3","MML3.CAP")))
+        {
+            Test("MML3 enabled export complete bundle and empty optional inputs",()=>
+            {
+                string source=Path.Combine(output,"PITMIX.MML"),folder=Path.Combine(output,"PITMIX");
+                File.WriteAllText(source,"MML3\n[A]\nC4 D4\n[B]\nE2\n[C]\nG2\n[N]\nN38/4 R4\n[P]\nO3 C4 D4\n");
+                MovieEngine.Export(video,null,null,folder,none,mml:source,pitEnabled:true).GetAwaiter().GetResult();
+                var score=MmlScore.Compile(File.ReadAllText(source),2000);
+                Check(File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZM")).SequenceEqual(score.Music)&&File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZP")).SequenceEqual(score.Pit!),"Export score differs from compiler.");
+                Check(Encoding.ASCII.GetString(File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZV")),0,4)=="WZV3","PIT video magic missing.");
+                Check(File.ReadAllText(Path.Combine(folder,"PIT.REQ"))=="WZP1"&&File.ReadAllText(Path.Combine(folder,"PLAY.BAT")).Contains(" /P"),"PIT enable or marker missing.");
+                Check(File.ReadAllBytes(Path.Combine(folder,"MOVPLAY.EXE")).SequenceEqual(File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory,"runtime-mml3","MOVPLAY.EXE"))),"Wrong runtime exported.");
+                Check(!File.Exists(Path.Combine(folder,"SPEECH.PCM")),"Empty speech generated a sidecar.");
+                Reject(()=>MovieEngine.Export(video,null,null,folder,none,mml:source,pitEnabled:true).GetAwaiter().GetResult());
+                Check(File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZP")).SequenceEqual(score.Pit!),"No-overwrite changed PIT data.");
+                string retry=Path.Combine(output,"PITRETRY");using var cancel=new CancellationTokenSource();cancel.Cancel();
+                try{MovieEngine.Export(video,null,null,retry,cancel.Token,mml:source,pitEnabled:true).GetAwaiter().GetResult();throw new Exception("Expected PIT cancellation.");}catch(OperationCanceledException){}
+                Check(!Directory.Exists(retry),"Cancelled PIT export remained.");MovieEngine.Export(video,null,null,retry,none,mml:source,pitEnabled:true).GetAwaiter().GetResult();
+            });
+            Test("MML3 empty and all-rest P retain required complete bundle",()=>
+            {
+                foreach(var (name,body) in new[]{("PITEMPTY","[A]\nC1\n[P]\n"),("PITREST","[P]\nR1\n")})
+                {string source=Path.Combine(output,name+".MML"),folder=Path.Combine(output,name);File.WriteAllText(source,"MML3\n"+body);MovieEngine.Export(video,null,null,folder,none,mml:source,pitEnabled:true).GetAwaiter().GetResult();Check(File.Exists(Path.Combine(folder,"PIT.REQ"))&&File.ReadAllBytes(Path.Combine(folder,"MOVIE.WZP")).Length==32,"Explicit rest part dropped.");}
+            });
+            Test("MML3 PIT speech conflict and actual guarded export",()=>
+            {
+                string source=Path.Combine(output,"PITSPEAK.MML"),folder=Path.Combine(output,"PITSPEAK");
+                File.WriteAllText(source,"MML3\n[A]\nR2 C2\n[N]\nR2 N38/2\n[P]\nR2 E2\n");
+                MovieEngine.Export(video,null,captions,folder,none,mml:source,pitEnabled:true,speech:[new(speechFile,300)]).GetAwaiter().GetResult();
+                string badSource=Path.Combine(output,"PITBAD.MML");File.WriteAllText(badSource,"MML3\n[P]\nC1\n");string bad=Path.Combine(output,"PITBADSP");
+                Reject(()=>MovieEngine.Export(video,null,null,bad,none,mml:badSource,pitEnabled:true,speech:[new(speechFile,300)]).GetAwaiter().GetResult());
+                Check(!Directory.Exists(bad),"PIT conflict published an export.");
+            });
+        }
         string fixtures=Path.Combine(output,"MML-CONFORMANCE");Directory.CreateDirectory(fixtures);
         foreach(var fixture in new[]{("BASIC","[A]\nT120 O4 L4 V12 @KEYS C D\n"),("DOTTED","[A]\nT120 O4 C4. R8 > C8\n"),("CARRIED","[A]\nT121 O4 [C64 R64]8\n"),("PRESETS","[A]\n@PAD O3 C1\n[B]\n@BELL O4 G1\n")})
         {var compiled=MmlScore.Compile(fixture.Item2);File.WriteAllText(Path.Combine(fixtures,fixture.Item1+".MML"),fixture.Item2);File.WriteAllBytes(Path.Combine(fixtures,fixture.Item1+".WZM"),compiled.Music);File.WriteAllBytes(Path.Combine(fixtures,fixture.Item1+".WZI"),compiled.Instruments);}
@@ -238,6 +301,15 @@ public static class SelfTest
         Application.Current.Dispatcher.Invoke(()=>
         {
         var window=new MainWindow(new DecoderSettings(Path.Combine(output,"UI-SETTINGS.json")),false);window.Show();
+        Test("native PIT enable starts unchecked",()=>Check(window.PitBox.IsChecked==false,"PIT enabled without explicit selection."));
+        Test("native owned gain starts unchecked and rejects incomplete ownership",()=>
+        {
+            Check(window.OwnedGainBox.IsChecked==false,"Owned gain enabled without explicit selection.");
+            var verify=typeof(MainWindow).GetMethod("OwnedInputs",BindingFlags.Instance|BindingFlags.NonPublic)!;
+            window.OwnedGainBox.IsChecked=true;
+            bool rejected=false;try{verify.Invoke(window,null);}catch(TargetInvocationException e){rejected=e.InnerException is ArgumentException;}
+            Check(rejected,"Owned gain accepted missing MIDI/annotation/automation inputs.");window.OwnedGainBox.IsChecked=false;
+        });
         Test("native range controls update duration and invalidate stale preview",()=>
         {
             window.SetSourceForTest(new(634.566667m,true));window.TrimStart.Text="20";window.TrimEnd.Text="22";
@@ -256,6 +328,7 @@ public static class SelfTest
         var screenshot=new RenderTargetBitmap((int)window.ActualWidth,(int)window.ActualHeight,96,96,PixelFormats.Pbgra32);screenshot.Render(window);
         var png=new PngBitmapEncoder();png.Frames.Add(BitmapFrame.Create(screenshot));using(var file=File.Create(Path.Combine(output,"MAKER-UI.png")))png.Save(file);
                 window.MidiPath.Text="";window.MmlPath.Text=noiseRest;window.SpeechGrid.ItemsSource=new[]{new SpeechRequest(speechFile,300)};window.InputsScroll.ScrollToBottom();window.UpdateLayout();
+        if(File.Exists(Path.Combine(AppContext.BaseDirectory,"runtime-mml3","MML3.CAP"))){window.MmlPath.Text=Path.Combine(output,"PITSPEAK.MML");window.PitBox.IsChecked=true;window.Status.Text="Generated fixture: MML3 PSG/PIT plus guarded speech; export verified. Preview is silent.";window.UpdateLayout();}
         var audioShot=new RenderTargetBitmap((int)window.ActualWidth,(int)window.ActualHeight,96,96,PixelFormats.Pbgra32);audioShot.Render(window);
         var audioPng=new PngBitmapEncoder();audioPng.Frames.Add(BitmapFrame.Create(audioShot));using(var file=File.Create(Path.Combine(output,"MAKER-AUDIO-UI.png")))audioPng.Save(file);
         window.Close();

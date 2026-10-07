@@ -1,0 +1,18 @@
+{
+  "runtime_sha256": "504B852BCE5D14F85EB52E3B61F3B85A8D13CFD1E0D150D7C2042747632354A2",
+  "spec_sha256": "5B7797BB161C4D1BD4005F03FD617DFF096BBBF9EE2A16E6E700831B569612BB",
+  "windows_child_pass": true,
+  "x64_harness_checks": 320,
+  "native_matrix_checks": 178,
+  "full_segments_pass": true,
+  "contract": "WZG1-v1",
+  "x64_independent_state_comparisons": 156,
+  "x64_actual_seek_buffer_comparisons": 150,
+  "native_integration_checks": 12,
+  "host_checks": 42,
+  "native_pass": true,
+  "maker_dll_sha256": "9EE637250CC6197A94767748BBD80F73C2EDF6DF178AD7558E297A8963C83382",
+  "limits": "Experimental Windows x64; no physical Tandy or human listening certification. DOS uses roughly55ms clock/dispatch bound; clipped held notes start fresh attack age; Win16 WZG1 unsupported.",
+  "speech_pass": true,
+  "x64_interop_pass": true
+}

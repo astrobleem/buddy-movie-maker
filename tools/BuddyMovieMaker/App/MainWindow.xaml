@@ -15,10 +15,24 @@
     <TextBlock Text="Music, captions and speech start at output movie time 0. Source trim does not shift or crop these separate tracks." Foreground="#A7B7CC" FontSize="12" TextWrapping="Wrap" Margin="0,5,0,0"/>
     <TextBlock Text="02   OPTIONAL EXTRAS" FontSize="13" FontWeight="SemiBold" Foreground="#58DDB2" Margin="0,28,0,8"/>
     <TextBlock Text="MIDI score"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse…" Click="MidiBrowse"/><TextBox x:Name="MidiPath" AutomationProperties.Name="Optional MIDI file"/></DockPanel>
-    <TextBlock Text="Three melodic PSG voices. Percussion, pitch bend and expression are omitted. Notes must be 45–96. No automatic soundtrack transcription." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/>
+    <TextBlock Text="Three melodic PSG voices (notes 45-96) and one fixed-noise drum voice (GM channel 10, keys 35-81). Pitch bend and expression are omitted. Export reports voice reduction. No automatic soundtrack transcription." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/>
+    <Expander Header="Verified cue fades (advanced)" Foreground="#A7B7CC" Margin="0,8,0,0">
+     <StackPanel>
+      <CheckBox x:Name="OwnedGainBox" Content="Apply verified cue fades to the MIDI score" IsChecked="False"/>
+      <StackPanel IsEnabled="{Binding IsChecked, ElementName=OwnedGainBox}">
+       <TextBlock Text="Use the complete source MIDI and its note ownership CSV. Every note must match. Fades apply only to that cue's notes." TextWrapping="Wrap" FontSize="12"/>
+       <TextBlock Text="Note ownership CSV"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse..." Click="OwnerBrowse"/><TextBox x:Name="OwnerPath" AutomationProperties.Name="Verified note ownership CSV"/></DockPanel>
+       <TextBlock Text="Cue fade automation CSV"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse..." Click="GainBrowse"/><TextBox x:Name="GainPath" AutomationProperties.Name="Cue scoped gain automation CSV"/></DockPanel>
+       <StackPanel Orientation="Horizontal"><TextBlock Text="Film time at output start (ms)" VerticalAlignment="Center"/><TextBox x:Name="FilmOrigin" Text="0" Width="100" Margin="8,0,0,0" AutomationProperties.Name="Owned MIDI film origin milliseconds"/></StackPanel>
+       <TextBlock Text="Set the film origin explicitly for a pre-trimmed video. Captions and speech still start at output zero. A cropped held note starts a fresh attack; earlier envelope age is not preserved. Export needs the qualified gain player." TextWrapping="Wrap" FontSize="12"/>
+      </StackPanel>
+     </StackPanel>
+    </Expander>
     <TextBlock Text="MML score (alternative to MIDI)" Margin="0,10,0,0"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse…" Click="MmlBrowse"/><TextBox x:Name="MmlPath" AutomationProperties.Name="Optional MML file"/></DockPanel>
     <StackPanel Orientation="Horizontal"><ComboBox x:Name="PresetBox" Width="140" SelectedIndex="0"><ComboBoxItem>KEYS</ComboBoxItem><ComboBoxItem>ORGAN</ComboBoxItem><ComboBoxItem>BASS</ComboBoxItem><ComboBoxItem>PAD</ComboBoxItem><ComboBoxItem>REED</ComboBoxItem><ComboBoxItem>LEAD</ComboBoxItem><ComboBoxItem>BELL</ComboBoxItem><ComboBoxItem>HIT</ComboBoxItem></ComboBox><CheckBox x:Name="VibratoBox" Content="Eligible preset vibrato" IsChecked="True" Margin="12,0" VerticalAlignment="Center"/></StackPanel>
-    <TextBlock Text="MML1 tones, or first-line MML2 with [N] drums (N35/16). Three tones + fixed noise, original WININST12 curves. Initial preset above; @ overrides tones. Preview stays silent." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12" Margin="0,5,0,0"/>
+    <TextBlock Text="MML1 tones; MML2 adds [N] drums (N35/16); MML3 adds optional [P] PC-speaker notes with V0/V1. PIT export needs a qualified player. Initial preset applies to PSG tones; @ overrides tones. Preview stays silent." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12" Margin="0,5,0,0"/>
+    <CheckBox x:Name="PitBox" Content="Enable required MML3 [P] PC-speaker voice" IsChecked="False" Margin="0,8,0,0"/>
+    <TextBlock Text="[P] exports need this explicit enable. Use a controlled foreground DOS session without other sound/timer writers. Preview remains silent." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/>
     <TextBlock Text="Captions (.txt or .lrc)" Margin="0,18,0,0"/><DockPanel><Button DockPanel.Dock="Right" Content="Browse…" Click="CaptionBrowse"/><TextBox x:Name="CaptionPath" AutomationProperties.Name="Optional captions file"/></DockPanel>
     <TextBlock Text="One cue per line: milliseconds|text. Up to 256 cues, 52 characters each. Leave captions empty for a caption-free movie." TextWrapping="Wrap" Foreground="#A7B7CC" FontSize="12"/>
     <TextBlock Text="03   TIMED DIGITAL SPEECH" FontSize="13" FontWeight="SemiBold" Foreground="#58DDB2" Margin="0,18,0,5"/>

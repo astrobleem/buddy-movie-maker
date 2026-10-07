@@ -12,5 +12,7 @@
     "FFmpeg binaries",
     "legacy Buddy assets"
   ],
-  "platform": "Windows x64 WPF; portable converter/CLI not implemented"
+  "platform": "Windows x64 WPF; portable converter/CLI not implemented",
+  "release_revision": "v0.2.0-experimental",
+  "release_scope": "Current qualified MIDI drums, MML1/2/3 PIT, WZG1 ownership/cue gain, generated speech/captions; synthetic samples only"
 }

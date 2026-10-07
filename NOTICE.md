@@ -12,7 +12,7 @@ included. Existing names, comments and shared MML specifications are preserved.
 
 Microsoft .NET/Windows Desktop runtime notices are retained in `notices/` for
 build/distribution preparation. No Microsoft executable or library is committed.
-Future binary packages must include the corresponding runtime notices and complete
+Binary packages include the corresponding runtime notices and complete
 Maker/player source. Legacy compiler/MASM/DDK files remain external prerequisites;
 their redistribution is not authorized by this repository's GPL license.
 

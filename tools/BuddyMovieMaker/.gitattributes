@@ -1,0 +1,20 @@
+# Preserve the frozen corpus, including CRLF and malformed-source blank lines.
+Tests/Mml3Contract/** -text whitespace=cr-at-eol,-blank-at-eof
+MML3.md -text
+WZG1.md -text
+Tests/WzgContract/** -text whitespace=cr-at-eol,-blank-at-eof
+RuntimeMml3/*.C text eol=crlf
+RuntimeMml3/*.H text eol=crlf
+RuntimeMml3/*.ASM text eol=crlf
+RuntimeMml3/*.BAT text eol=crlf
+# Sound adapter handoff files retain their reviewed bytes.
+RuntimeMml3/DOSSND.C -text whitespace=cr-at-eol
+RuntimeMml3/DOSSND.H -text whitespace=cr-at-eol
+RuntimeMml3/DOSGUARD.H -text whitespace=cr-at-eol
+RuntimeMml3/win30/DRIVER/PITCORE.H -text whitespace=cr-at-eol
+
+# Separate gain copy preserves the same reviewed sound adapter bytes.
+RuntimeGain/DOSSND.C -text whitespace=cr-at-eol
+RuntimeGain/DOSSND.H -text whitespace=cr-at-eol
+RuntimeGain/DOSGUARD.H -text whitespace=cr-at-eol
+RuntimeGain/win30/DRIVER/PITCORE.H -text whitespace=cr-at-eol

@@ -1,0 +1,1498 @@
+{
+  "reference_pass": true,
+  "family": "WZM3 required; included video must be WZV4; old families unchanged",
+  "status": "REVISION1 REFERENCE CONTRACT; agreed identifiers/semantics; runtime qualification separate; no production gain emission",
+  "layout": "WZG1/20/8/u32count/u32duration/u32reserved0; timestamp u32 + four u8 PSG extra steps",
+  "cases": [
+    {
+      "reason": "program -> attack -> gain, one flush; held B/C preset snapshots unchanged; expired hat not revived",
+      "proposed_accept": true,
+      "name": "SIMULTANEOUS"
+    },
+    {
+      "reason": "Existing vibrato bit0 plus proposed gain bit1",
+      "proposed_accept": true,
+      "name": "VIBRATO_GAIN"
+    },
+    {
+      "reason": "WZI bit2 explicitly requires WZP1/PIT.REQ even when empty/rest; audio-only",
+      "proposed_accept": true,
+      "name": "GAIN_PIT"
+    },
+    {
+      "reason": "Only bits0..2 allowed in new gain family; audio-only",
+      "proposed_accept": true,
+      "name": "GAIN_PIT_VIBRATO"
+    },
+    {
+      "reason": "No gain artifacts; old flags/semantics preserved",
+      "proposed_accept": true,
+      "name": "LEGACY"
+    },
+    {
+      "reason": "WZM3 directly gates audio without a video file",
+      "proposed_accept": true,
+      "name": "AUDIO_ONLY"
+    },
+    {
+      "reason": "Gain count10,000 independent of WZM/WZI counts; exactly80,020 bytes",
+      "proposed_accept": true,
+      "name": "COUNT10000"
+    },
+    {
+      "reason": "Maximum duration; final gain evaluated then owned output stopped",
+      "proposed_accept": true,
+      "name": "DURATION600000"
+    },
+    {
+      "reason": "Required bundle member missing",
+      "proposed_accept": false,
+      "name": "MISSING_GAIN"
+    },
+    {
+      "reason": "Required bundle member missing",
+      "proposed_accept": false,
+      "name": "MISSING_MARKER"
+    },
+    {
+      "reason": "Required bundle member missing",
+      "proposed_accept": false,
+      "name": "MISSING_INST_MARKER"
+    },
+    {
+      "reason": "Required bundle member missing",
+      "proposed_accept": false,
+      "name": "MISSING_INSTRUMENT"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "UNKNOWN_FLAG"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "FLAG_NOT_SET"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "RESERVED"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "HEADER_SIZE"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "RECORD_SIZE"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "DURATION_MISMATCH"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "GAIN16"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "FIRST_NOT_ZERO"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "DUPLICATE_TIME"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "FINAL_NOT_MUTE"
+    },
+    {
+      "reason": "Strict header/time/flag/gain validation",
+      "proposed_accept": false,
+      "name": "UNKNOWN_MAGIC"
+    },
+    {
+      "reason": "Marker exactly four ASCII bytes",
+      "proposed_accept": false,
+      "name": "MARKER_NEWLINE"
+    },
+    {
+      "reason": "Marker exactly four ASCII bytes",
+      "proposed_accept": false,
+      "name": "MARKER_CASE"
+    },
+    {
+      "reason": "Exact stream length",
+      "proposed_accept": false,
+      "name": "TRAILING"
+    },
+    {
+      "reason": "Exact stream length",
+      "proposed_accept": false,
+      "name": "TRUNCATED"
+    },
+    {
+      "reason": "Gain count beyond independent10,000 limit",
+      "proposed_accept": false,
+      "name": "COUNT10001"
+    },
+    {
+      "reason": "One marked bundle basename",
+      "proposed_accept": false,
+      "name": "SECOND_BASENAME"
+    },
+    {
+      "reason": "Explicit WZI PIT requirement survives artifact stripping",
+      "proposed_accept": false,
+      "name": "PIT_BOTH_STRIPPED"
+    },
+    {
+      "reason": "Explicit WZI PIT requirement survives artifact stripping",
+      "proposed_accept": false,
+      "name": "PIT_MARKER_STRIPPED"
+    },
+    {
+      "reason": "Explicit WZI PIT requirement survives artifact stripping",
+      "proposed_accept": false,
+      "name": "PIT_STREAM_STRIPPED"
+    },
+    {
+      "reason": "PIT artifacts without declared flag4",
+      "proposed_accept": false,
+      "name": "PIT_UNDECLARED"
+    },
+    {
+      "reason": "Gain family must consume WZM3, never WZM1/WZM2",
+      "proposed_accept": false,
+      "name": "MIXED_WZM1"
+    },
+    {
+      "reason": "Included gain video must be WZV4",
+      "proposed_accept": false,
+      "name": "MIXED_WZV2"
+    },
+    {
+      "reason": "WZV4 never falls back to silent video-only when music is removed",
+      "proposed_accept": false,
+      "name": "MISSING_MUSIC"
+    },
+    {
+      "reason": "Direct WZM3/WZV4 gates survive complete sidecar stripping",
+      "proposed_accept": false,
+      "name": "ALL_SIDECARS_STRIPPED"
+    },
+    {
+      "reason": "First time0 snapshot evaluates source gain at cropped origin; not necessarily all0",
+      "proposed_accept": true,
+      "name": "CROPPED_GAIN"
+    },
+    {
+      "reason": "Old family mask remains1",
+      "proposed_accept": false,
+      "name": "OLD_FLAG4"
+    },
+    {
+      "reason": "At least two records",
+      "proposed_accept": false,
+      "name": "COUNT1"
+    },
+    {
+      "reason": "600s limit unchanged",
+      "proposed_accept": false,
+      "name": "DURATION600001"
+    },
+    {
+      "reason": "Gain terminal15 cannot replace final logical rest",
+      "proposed_accept": false,
+      "name": "MUSIC_FINAL_NOT_REST"
+    },
+    {
+      "reason": "Cue04 same-note/velocity handover retriggers, resets selected owner gain; cue03 scoped off leaves cue04",
+      "proposed_accept": true,
+      "name": "OWNER_AUDIO"
+    }
+  ],
+  "flags": "In gain family WZI bit0 vibrato, bit1 gain-required, bit2 PIT-required; outside gain family old rules unchanged",
+  "files": [
+    {
+      "sha256": "C72B457521D8E2E41A5EF482C5B59C333628E3FCE681BA57B82EC10F29E1DC4B",
+      "bytes": 6604,
+      "path": "ORDERING-QUERIES.json"
+    },
+    {
+      "sha256": "D72FCD2D4D8A7BF24D5CF3A4B92A408753EA0D7960B0D03FC3940B71A52EE83A",
+      "bytes": 563,
+      "path": "OWNER-QUERIES.json"
+    },
+    {
+      "sha256": "5B7797BB161C4D1BD4005F03FD617DFF096BBBF9EE2A16E6E700831B569612BB",
+      "bytes": 6114,
+      "path": "WZG1.md"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "ALL_SIDECARS_STRIPPED\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "ALL_SIDECARS_STRIPPED\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "AUDIO_ONLY\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "AUDIO_ONLY\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "AUDIO_ONLY\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "AUDIO_ONLY\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "AUDIO_ONLY\\MOVIE.WZM"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "COUNT1\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "COUNT1\\INST.REQ"
+    },
+    {
+      "sha256": "DB50CF932243294CBDCCCC67C77DA19D0F016AB8B24686B29E898A8D7B77476A",
+      "bytes": 28,
+      "path": "COUNT1\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "COUNT1\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "COUNT1\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "COUNT1\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "COUNT10000\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "COUNT10000\\INST.REQ"
+    },
+    {
+      "sha256": "C46B0B08A991DCAFAA58C41F205466736DBFA7B30938A218F59DE2F191D9062E",
+      "bytes": 80020,
+      "path": "COUNT10000\\MOVIE.WZG"
+    },
+    {
+      "sha256": "A25E5098433F7D66B024859318D1B91AFD1E34154CF825A8467AD4959DE02118",
+      "bytes": 36,
+      "path": "COUNT10000\\MOVIE.WZI"
+    },
+    {
+      "sha256": "9F8EB507DE6220DDA0BB6C6016FFFE5C8D50B06106BBE99A3AAA7EAF940DED0C",
+      "bytes": 62,
+      "path": "COUNT10000\\MOVIE.WZM"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "COUNT10001\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "COUNT10001\\INST.REQ"
+    },
+    {
+      "sha256": "D1D37DB8A1B8CD951567EDD07642DF496886A10AA8DA6768114B9CC68E588960",
+      "bytes": 80028,
+      "path": "COUNT10001\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "COUNT10001\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "COUNT10001\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "COUNT10001\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "CROPPED_GAIN\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "CROPPED_GAIN\\INST.REQ"
+    },
+    {
+      "sha256": "9BEBB9F8BAC5D0F13817469F44CA4D1B9E372A42FE0D782CC26ED81BE84CE1D8",
+      "bytes": 36,
+      "path": "CROPPED_GAIN\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "CROPPED_GAIN\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "CROPPED_GAIN\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "CROPPED_GAIN\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "DUPLICATE_TIME\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "DUPLICATE_TIME\\INST.REQ"
+    },
+    {
+      "sha256": "1FB12F88B23BA2D9C50E2A949D411FBC70676155901033CF7E76D97C1D7A509E",
+      "bytes": 68,
+      "path": "DUPLICATE_TIME\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "DUPLICATE_TIME\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "DUPLICATE_TIME\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "DUPLICATE_TIME\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "DURATION600000\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "DURATION600000\\INST.REQ"
+    },
+    {
+      "sha256": "03655FE9BD46C178350CF511D8751C0C17257A12F4CB2FBB2652D7CEDFB60538",
+      "bytes": 44,
+      "path": "DURATION600000\\MOVIE.WZG"
+    },
+    {
+      "sha256": "8DEB186D9A114F3E7A900ED93B8EA5BD8036E864B4922D2704BEEDDB071B5F0A",
+      "bytes": 36,
+      "path": "DURATION600000\\MOVIE.WZI"
+    },
+    {
+      "sha256": "72D72A2A146A7C737069C9F8D4C1A3D5CBDB9EC65394C5B0BB5DAA716E270C79",
+      "bytes": 62,
+      "path": "DURATION600000\\MOVIE.WZM"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "DURATION600001\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "DURATION600001\\INST.REQ"
+    },
+    {
+      "sha256": "87B89F853610A03D9182140F3E8DC56D012DD5E7BF6EDF50EBA9C645AC742908",
+      "bytes": 36,
+      "path": "DURATION600001\\MOVIE.WZG"
+    },
+    {
+      "sha256": "7A7F6199ACCC16E65105F8CB2EC3ECB167DC38757DE66FFE72718CEC9D508355",
+      "bytes": 36,
+      "path": "DURATION600001\\MOVIE.WZI"
+    },
+    {
+      "sha256": "5A9FB42D472E584E69CACF93EF6ADFBD4D1988E1ABC07E231B5397A281A200B3",
+      "bytes": 62,
+      "path": "DURATION600001\\MOVIE.WZM"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "DURATION_MISMATCH\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "DURATION_MISMATCH\\INST.REQ"
+    },
+    {
+      "sha256": "0A34EC668CA6679C2502ECF1FE40194BF0EC762EEF43A10D402861B6E2887717",
+      "bytes": 68,
+      "path": "DURATION_MISMATCH\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "DURATION_MISMATCH\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "DURATION_MISMATCH\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "DURATION_MISMATCH\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "FINAL_NOT_MUTE\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "FINAL_NOT_MUTE\\INST.REQ"
+    },
+    {
+      "sha256": "F6E5A3464015B42C609C21F919BE7F5C2D469E864111F1F392C3187EBF58AE36",
+      "bytes": 68,
+      "path": "FINAL_NOT_MUTE\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "FINAL_NOT_MUTE\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "FINAL_NOT_MUTE\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "FINAL_NOT_MUTE\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "FIRST_NOT_ZERO\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "FIRST_NOT_ZERO\\INST.REQ"
+    },
+    {
+      "sha256": "897EF97CE219E2760BC7E030C5985B2BCC29614A558DB521FA5444F5B70CBF76",
+      "bytes": 68,
+      "path": "FIRST_NOT_ZERO\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "FIRST_NOT_ZERO\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "FIRST_NOT_ZERO\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "FIRST_NOT_ZERO\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "FLAG_NOT_SET\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "FLAG_NOT_SET\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "FLAG_NOT_SET\\MOVIE.WZG"
+    },
+    {
+      "sha256": "DE14DCE43F92CD74A2991933DEED2948D2DA09CF076C7CE19659D0AE2D71A49D",
+      "bytes": 36,
+      "path": "FLAG_NOT_SET\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "FLAG_NOT_SET\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "FLAG_NOT_SET\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "GAIN16\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "GAIN16\\INST.REQ"
+    },
+    {
+      "sha256": "0E91BF76A2B063A95F400E4F870D6E9A266DF850710DB128863B249C6F8CB345",
+      "bytes": 68,
+      "path": "GAIN16\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "GAIN16\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "GAIN16\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "GAIN16\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "GAIN_PIT\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "GAIN_PIT\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "GAIN_PIT\\MOVIE.WZG"
+    },
+    {
+      "sha256": "59BD18D454559954CE4C32E7BCA4ADE559A02A4C9F535EAC968106F8A1132411",
+      "bytes": 36,
+      "path": "GAIN_PIT\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "GAIN_PIT\\MOVIE.WZM"
+    },
+    {
+      "sha256": "64DA1BA12CE17BDD3034E891E381029696AD89C5381B59AEB764718AFBDA7F7E",
+      "bytes": 32,
+      "path": "GAIN_PIT\\MOVIE.WZP"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "GAIN_PIT\\MOVIE.WZV"
+    },
+    {
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8",
+      "bytes": 4,
+      "path": "GAIN_PIT\\PIT.REQ"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "GAIN_PIT_VIBRATO\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "GAIN_PIT_VIBRATO\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "GAIN_PIT_VIBRATO\\MOVIE.WZG"
+    },
+    {
+      "sha256": "7830224573248689E4E862DBF55D7A889F6C5D4B8B769B85AA90C0C12F45D303",
+      "bytes": 36,
+      "path": "GAIN_PIT_VIBRATO\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "GAIN_PIT_VIBRATO\\MOVIE.WZM"
+    },
+    {
+      "sha256": "64DA1BA12CE17BDD3034E891E381029696AD89C5381B59AEB764718AFBDA7F7E",
+      "bytes": 32,
+      "path": "GAIN_PIT_VIBRATO\\MOVIE.WZP"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "GAIN_PIT_VIBRATO\\MOVIE.WZV"
+    },
+    {
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8",
+      "bytes": 4,
+      "path": "GAIN_PIT_VIBRATO\\PIT.REQ"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "HEADER_SIZE\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "HEADER_SIZE\\INST.REQ"
+    },
+    {
+      "sha256": "26E3C65AD5C61FA9F57F694916C26F22E5CBE1E56EB7142828438EEDC8D1A999",
+      "bytes": 68,
+      "path": "HEADER_SIZE\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "HEADER_SIZE\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "HEADER_SIZE\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "HEADER_SIZE\\MOVIE.WZV"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "LEGACY\\INST.REQ"
+    },
+    {
+      "sha256": "DE14DCE43F92CD74A2991933DEED2948D2DA09CF076C7CE19659D0AE2D71A49D",
+      "bytes": 36,
+      "path": "LEGACY\\MOVIE.WZI"
+    },
+    {
+      "sha256": "910A40B0F823F62FC358D691F281C95C298EA08AFF3A69C342ABBB75B5767082",
+      "bytes": 62,
+      "path": "LEGACY\\MOVIE.WZM"
+    },
+    {
+      "sha256": "C6BADB6883D1A76195738F1A718C982D3AA3E0BE16D8FF84A010EA7226DBA832",
+      "bytes": 81944,
+      "path": "LEGACY\\MOVIE.WZV"
+    },
+    {
+      "sha256": "83ED8C4BCEABDF2953564F34F842CB8F8DEB4B4C37F42DFA1B273D62CEE0224D",
+      "bytes": 4,
+      "path": "MARKER_CASE\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MARKER_CASE\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MARKER_CASE\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MARKER_CASE\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "MARKER_CASE\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MARKER_CASE\\MOVIE.WZV"
+    },
+    {
+      "sha256": "BFFF4B28583DA842AF7EE5DC2985ABB2F163E098189085E15973B61628AD6FC2",
+      "bytes": 5,
+      "path": "MARKER_NEWLINE\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MARKER_NEWLINE\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MARKER_NEWLINE\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MARKER_NEWLINE\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "MARKER_NEWLINE\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MARKER_NEWLINE\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "MISSING_GAIN\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MISSING_GAIN\\INST.REQ"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MISSING_GAIN\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "MISSING_GAIN\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MISSING_GAIN\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "MISSING_INSTRUMENT\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MISSING_INSTRUMENT\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MISSING_INSTRUMENT\\MOVIE.WZG"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "MISSING_INSTRUMENT\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MISSING_INSTRUMENT\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "MISSING_INST_MARKER\\GAIN.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MISSING_INST_MARKER\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MISSING_INST_MARKER\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "MISSING_INST_MARKER\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MISSING_INST_MARKER\\MOVIE.WZV"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MISSING_MARKER\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MISSING_MARKER\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MISSING_MARKER\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "MISSING_MARKER\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MISSING_MARKER\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "MISSING_MUSIC\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MISSING_MUSIC\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MISSING_MUSIC\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MISSING_MUSIC\\MOVIE.WZI"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MISSING_MUSIC\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "MIXED_WZM1\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MIXED_WZM1\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MIXED_WZM1\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MIXED_WZM1\\MOVIE.WZI"
+    },
+    {
+      "sha256": "910A40B0F823F62FC358D691F281C95C298EA08AFF3A69C342ABBB75B5767082",
+      "bytes": 62,
+      "path": "MIXED_WZM1\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MIXED_WZM1\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "MIXED_WZV2\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MIXED_WZV2\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MIXED_WZV2\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MIXED_WZV2\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "MIXED_WZV2\\MOVIE.WZM"
+    },
+    {
+      "sha256": "C6BADB6883D1A76195738F1A718C982D3AA3E0BE16D8FF84A010EA7226DBA832",
+      "bytes": 81944,
+      "path": "MIXED_WZV2\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "MUSIC_FINAL_NOT_REST\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "MUSIC_FINAL_NOT_REST\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "MUSIC_FINAL_NOT_REST\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "MUSIC_FINAL_NOT_REST\\MOVIE.WZI"
+    },
+    {
+      "sha256": "1E4F3C01AC3EEA995229CA3C40FBEEA962898A4255556DD3E1499F0598B4BE9C",
+      "bytes": 62,
+      "path": "MUSIC_FINAL_NOT_REST\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "MUSIC_FINAL_NOT_REST\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "OLD_FLAG4\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "OLD_FLAG4\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "OLD_FLAG4\\MOVIE.WZG"
+    },
+    {
+      "sha256": "B8A1AC28F9E709E6A5AA56DBE81F8C4854A36CB294E51EFF7381947E7BB7C3E8",
+      "bytes": 36,
+      "path": "OLD_FLAG4\\MOVIE.WZI"
+    },
+    {
+      "sha256": "910A40B0F823F62FC358D691F281C95C298EA08AFF3A69C342ABBB75B5767082",
+      "bytes": 62,
+      "path": "OLD_FLAG4\\MOVIE.WZM"
+    },
+    {
+      "sha256": "C6BADB6883D1A76195738F1A718C982D3AA3E0BE16D8FF84A010EA7226DBA832",
+      "bytes": 81944,
+      "path": "OLD_FLAG4\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "OWNER_AUDIO\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "OWNER_AUDIO\\INST.REQ"
+    },
+    {
+      "sha256": "F3E9638D4825495BDC30F7AF7C7C3570873FB8F4B501ABC004EFFE13FA6EEF6A",
+      "bytes": 68,
+      "path": "OWNER_AUDIO\\MOVIE.WZG"
+    },
+    {
+      "sha256": "FA4A7E63293CF1C5F8BE248C3323EADFF7351877F6044174E38AD12037D5869A",
+      "bytes": 28,
+      "path": "OWNER_AUDIO\\MOVIE.WZI"
+    },
+    {
+      "sha256": "A3568D37B8912F0E091F456090DC5D74A9A81F96782BD805C420C8E632FC0EB6",
+      "bytes": 76,
+      "path": "OWNER_AUDIO\\MOVIE.WZM"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "PIT_BOTH_STRIPPED\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "PIT_BOTH_STRIPPED\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "PIT_BOTH_STRIPPED\\MOVIE.WZG"
+    },
+    {
+      "sha256": "59BD18D454559954CE4C32E7BCA4ADE559A02A4C9F535EAC968106F8A1132411",
+      "bytes": 36,
+      "path": "PIT_BOTH_STRIPPED\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "PIT_BOTH_STRIPPED\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "PIT_BOTH_STRIPPED\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "PIT_MARKER_STRIPPED\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "PIT_MARKER_STRIPPED\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "PIT_MARKER_STRIPPED\\MOVIE.WZG"
+    },
+    {
+      "sha256": "59BD18D454559954CE4C32E7BCA4ADE559A02A4C9F535EAC968106F8A1132411",
+      "bytes": 36,
+      "path": "PIT_MARKER_STRIPPED\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "PIT_MARKER_STRIPPED\\MOVIE.WZM"
+    },
+    {
+      "sha256": "64DA1BA12CE17BDD3034E891E381029696AD89C5381B59AEB764718AFBDA7F7E",
+      "bytes": 32,
+      "path": "PIT_MARKER_STRIPPED\\MOVIE.WZP"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "PIT_MARKER_STRIPPED\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "PIT_STREAM_STRIPPED\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "PIT_STREAM_STRIPPED\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "PIT_STREAM_STRIPPED\\MOVIE.WZG"
+    },
+    {
+      "sha256": "59BD18D454559954CE4C32E7BCA4ADE559A02A4C9F535EAC968106F8A1132411",
+      "bytes": 36,
+      "path": "PIT_STREAM_STRIPPED\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "PIT_STREAM_STRIPPED\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "PIT_STREAM_STRIPPED\\MOVIE.WZV"
+    },
+    {
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8",
+      "bytes": 4,
+      "path": "PIT_STREAM_STRIPPED\\PIT.REQ"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "PIT_UNDECLARED\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "PIT_UNDECLARED\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "PIT_UNDECLARED\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "PIT_UNDECLARED\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "PIT_UNDECLARED\\MOVIE.WZM"
+    },
+    {
+      "sha256": "64DA1BA12CE17BDD3034E891E381029696AD89C5381B59AEB764718AFBDA7F7E",
+      "bytes": 32,
+      "path": "PIT_UNDECLARED\\MOVIE.WZP"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "PIT_UNDECLARED\\MOVIE.WZV"
+    },
+    {
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8",
+      "bytes": 4,
+      "path": "PIT_UNDECLARED\\PIT.REQ"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "RECORD_SIZE\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "RECORD_SIZE\\INST.REQ"
+    },
+    {
+      "sha256": "5CB9DDE5E5FD92DAFEB0BCB3687B6B35871858ADD4F8C87E98AC2E6BE39273D3",
+      "bytes": 68,
+      "path": "RECORD_SIZE\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "RECORD_SIZE\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "RECORD_SIZE\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "RECORD_SIZE\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "RESERVED\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "RESERVED\\INST.REQ"
+    },
+    {
+      "sha256": "AA45C2B6A01C16F28059BC1CF85AC441B7E434B1C167BEE0F65456B3D80FD3FD",
+      "bytes": 68,
+      "path": "RESERVED\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "RESERVED\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "RESERVED\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "RESERVED\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "SECOND_BASENAME\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "SECOND_BASENAME\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "SECOND_BASENAME\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "SECOND_BASENAME\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "SECOND_BASENAME\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "SECOND_BASENAME\\MOVIE.WZV"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "SECOND_BASENAME\\OTHER.WZG"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "SIMULTANEOUS\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "SIMULTANEOUS\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "SIMULTANEOUS\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "SIMULTANEOUS\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "SIMULTANEOUS\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "SIMULTANEOUS\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "TRAILING\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "TRAILING\\INST.REQ"
+    },
+    {
+      "sha256": "46E828D75A9C00D53E9C8FC2E73F01791AB7591AB43CCCE63E97E684A397FFB8",
+      "bytes": 69,
+      "path": "TRAILING\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "TRAILING\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "TRAILING\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "TRAILING\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "TRUNCATED\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "TRUNCATED\\INST.REQ"
+    },
+    {
+      "sha256": "9E4103A74F3596FDE9E5D25F6FCB47E4E40C96D67BE3857F33619A2FB8657759",
+      "bytes": 67,
+      "path": "TRUNCATED\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "TRUNCATED\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "TRUNCATED\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "TRUNCATED\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "UNKNOWN_FLAG\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "UNKNOWN_FLAG\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "UNKNOWN_FLAG\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F868F2945FF67F12D10DBDC348D73380211CD64BA03C1056B42853A59A781995",
+      "bytes": 36,
+      "path": "UNKNOWN_FLAG\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "UNKNOWN_FLAG\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "UNKNOWN_FLAG\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "UNKNOWN_MAGIC\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "UNKNOWN_MAGIC\\INST.REQ"
+    },
+    {
+      "sha256": "30A97A57B586D18B53E45C208DD1B40179B9F1B412CBDD4D47120CEE326C33ED",
+      "bytes": 68,
+      "path": "UNKNOWN_MAGIC\\MOVIE.WZG"
+    },
+    {
+      "sha256": "F3CEA55993D5592A21171624DBA0BDAA910F696563EB77734920619A44E104EF",
+      "bytes": 36,
+      "path": "UNKNOWN_MAGIC\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "UNKNOWN_MAGIC\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "UNKNOWN_MAGIC\\MOVIE.WZV"
+    },
+    {
+      "sha256": "4CDD40017345F0C23EB1FDB6E47E8A30CA42E06B22E03F3593F11136C4DFCBD9",
+      "bytes": 4,
+      "path": "VIBRATO_GAIN\\GAIN.REQ"
+    },
+    {
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA",
+      "bytes": 4,
+      "path": "VIBRATO_GAIN\\INST.REQ"
+    },
+    {
+      "sha256": "2A59151863EE60DF3FE04108414FAFA771301F758903E85BB7637BC3E6AFE83A",
+      "bytes": 68,
+      "path": "VIBRATO_GAIN\\MOVIE.WZG"
+    },
+    {
+      "sha256": "2CC77F1D96F1CFBEED499C2EB782526CD77983AA093734F744EC132BEF69D22E",
+      "bytes": 36,
+      "path": "VIBRATO_GAIN\\MOVIE.WZI"
+    },
+    {
+      "sha256": "C9BBDBE403324A3418094F67CD7E880B267B5B93FA827ABA72617971CF41EE80",
+      "bytes": 62,
+      "path": "VIBRATO_GAIN\\MOVIE.WZM"
+    },
+    {
+      "sha256": "49E93808D17EE17CF677AD754B23EC4A19A925D0D647748C4F17D7C87BEA356F",
+      "bytes": 81944,
+      "path": "VIBRATO_GAIN\\MOVIE.WZV"
+    }
+  ],
+  "spec_sha256": "5B7797BB161C4D1BD4005F03FD617DFF096BBBF9EE2A16E6E700831B569612BB",
+  "marker": "GAIN.REQ exactly WZG1; INST.REQ exactly WZI1; flag4 also exact PIT.REQ=WZP1 plus WZP1"
+}

@@ -10,7 +10,7 @@ There is no automatic soundtrack-to-PSG transcription. Windows preview is silent
 
 ## Use
 
-1. Build the app, then run `BuddyMovieMaker.exe` from its complete output folder.
+1. Download the [experimental Windows x64 package](https://github.com/astrobleem/buddy-movie-maker/releases/tag/v0.2.0-experimental), extract it, then run `BuddyMovieMaker.exe` from its complete folder.
 2. Select an existing `ffmpeg.exe` with `ffprobe.exe` beside it. Maker remembers
    the validated folder for your Windows user and checks it on subsequent launches.
 3. Choose a video and source start/end in seconds. Blank end means EOF.
@@ -22,7 +22,12 @@ There is no automatic soundtrack-to-PSG transcription. Windows preview is silent
 
 Original media and existing exports are preserved. Maker does not access CF cards.
 Built Windows packages include .NET and need no Python or separate .NET install.
-FFmpeg is supplied separately; this source repository includes no release binaries.
+FFmpeg is supplied separately. The release includes synthetic examples and
+complete corresponding source, with no private movie or recording assets.
+The experimental package includes ordinary MIDI drums, MML1/2, explicitly
+enabled MML3/PIT, captions, timed speech and verified ownership/cue fades (WZG1).
+Preview uses the exported RGBI pixels and remains silent. Read the package's
+`RELEASE-QUALIFICATION.json` for the exact tested scope; Win16 WZG1 is unsupported.
 See the [full guide](tools/BuddyMovieMaker/README.md) for exact profiles and limits.
 
 ## Build and test

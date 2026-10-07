@@ -7,7 +7,7 @@ resolved through NuGet during build. No SDK/runtime binary is committed.
 The self-contained build copies the packages' license and third-party notice
 files into its output folder. Corresponding notice texts are also in `notices/`.
 
-Release metadata checked on 2026-10-05 identified .NET 8 support ending
+Official release metadata rechecked on 2026-10-07 confirmed runtime8.0.31 and SDK8.0.425 remain current for .NET8, and identified .NET 8 support ending
 2026-11-10. The pinned build needs a supported-runtime migration before that date.
 Official metadata: https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/8.0/releases.json
 
