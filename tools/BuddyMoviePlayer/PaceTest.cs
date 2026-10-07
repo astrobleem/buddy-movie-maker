@@ -9,8 +9,8 @@ static class PaceTest
   Directory.CreateDirectory(output);var events=new List<string>();
   try {
    string moviePath=input;
-   bool pit=input=="synthetic-pit";
-   if(input is "synthetic" or "synthetic-pit") {string folder=Path.Combine(output,"synthetic-72-seconds");CreateFixture(folder,pit);moviePath=Path.Combine(folder,"MOVIE.WZV");}
+   bool pit=input is "synthetic-pit" or "synthetic-gain-pit",gain=input is "synthetic-gain" or "synthetic-gain-pit";
+   if(input is "synthetic" or "synthetic-pit" or "synthetic-gain" or "synthetic-gain-pit") {string folder=Path.Combine(output,"synthetic-72-seconds");CreateFixture(folder,pit,gain);moviePath=Path.Combine(folder,"MOVIE.WZV");}
    using var movie=new Movie(moviePath,pit);int duration=movie.Duration;
    using var player=new Player(){PitEnabled=pit};player.Show();Application.DoEvents();var loading=Stopwatch.StartNew();var open=player.OpenAsync(moviePath,false);while(!open.IsCompleted){Application.DoEvents();Thread.Sleep(5);}open.GetAwaiter().GetResult();loading.Stop();
    events.Add($"duration_ms={duration}; sample_rate={Synth.Rate}; samples={duration*(Synth.Rate/1000)}; bytes={duration*(Synth.Rate/1000)*2}; format=mono PCM16; render_and_open_wall_ms={loading.ElapsedMilliseconds}");
@@ -38,12 +38,13 @@ static class PaceTest
   Application.DoEvents();player.TickPlayback();var final=player.AudioClock;rawLast=final.Value;type=final.Type;return new(wall.ElapsedMilliseconds,player.Position-first,(player.Position-first)/(double)wall.ElapsedMilliseconds,monotonic,maxDrift,type,(long)rawLast-rawFirst.Value);
  }
  static void Pump(Player player,int ms){var watch=Stopwatch.StartNew();while(watch.ElapsedMilliseconds<ms){Application.DoEvents();player.TickPlayback();Thread.Sleep(5);}}
- internal static void CreateFixture(string folder,bool pit=false)
+ internal static void CreateFixture(string folder,bool pit=false,bool gain=false)
  {
   Directory.CreateDirectory(folder);const int duration=72000,width=256,height=160,frames=288;
   using(var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZV")))){w.Write(Encoding.ASCII.GetBytes("WZV2"));w.Write((ushort)width);w.Write((ushort)height);w.Write((ushort)4);w.Write((ushort)24);w.Write(frames);w.Write(duration);w.Write(width*height/2);for(int f=0;f<frames;f++)for(int i=0;i<width*height/2;i++)w.Write((byte)(((f%16)<<4)|(i%16)));}
   using(var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZM")))){w.Write(Encoding.ASCII.GetBytes("WZM1"));w.Write((ushort)20);w.Write((ushort)14);w.Write(2);w.Write(duration);w.Write(0);w.Write(0);w.Write(new byte[]{60,64,67,38});w.Write(new byte[]{88,88,88,64});w.Write((byte)15);w.Write((byte)0);w.Write(duration);w.Write(new byte[10]);}
   if(pit){foreach(var item in new[]{("MOVIE.WZV","WZV3"),("MOVIE.WZM","WZM2")}){using var f=new FileStream(Path.Combine(folder,item.Item1),FileMode.Open,FileAccess.Write);f.Write(Encoding.ASCII.GetBytes(item.Item2));}
    File.WriteAllText(Path.Combine(folder,"PIT.REQ"),"WZP1");using var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZP")));w.Write(Encoding.ASCII.GetBytes("WZP1"));w.Write((ushort)1);w.Write((ushort)0);w.Write(duration);w.Write((ushort)4);w.Write((ushort)0);foreach(var p in new[]{new PitNote(0,69,true),new PitNote(30000,69,true),new PitNote(45000,76,false),new PitNote(duration,0,false)}){w.Write(p.Time);w.Write(p.Note);w.Write((byte)(p.Attack?1:0));w.Write((ushort)0);}}
+  if(gain){foreach(var p in new[]{("MOVIE.WZV","WZV4"),("MOVIE.WZM","WZM3")}){using var f=new FileStream(Path.Combine(folder,p.Item1),FileMode.Open,FileAccess.Write);f.Write(Encoding.ASCII.GetBytes(p.Item2));}File.WriteAllText(Path.Combine(folder,"INST.REQ"),"WZI1");File.WriteAllText(Path.Combine(folder,"GAIN.REQ"),"WZG1");using(var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZI")))){w.Write(Encoding.ASCII.GetBytes("WZI1"));w.Write((ushort)20);w.Write((ushort)8);w.Write(2);w.Write(duration);w.Write((ushort)(pit?7:3));w.Write((ushort)0x102);w.Write(0);w.Write(new byte[]{16,48,80,0});w.Write(30000);w.Write(new byte[]{80,48,80,0});}using(var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZG")))){w.Write(Encoding.ASCII.GetBytes("WZG1"));w.Write((ushort)20);w.Write((ushort)8);w.Write(10);w.Write(duration);w.Write(0);foreach(var p in new[]{(0,0),(10000,2),(20000,5),(20005,6),(30000,10),(35000,15),(38000,0),(55000,3),(60000,6),(duration,15)}){w.Write(p.Item1);w.Write(Enumerable.Repeat((byte)p.Item2,4).ToArray());}}}
  }
 }

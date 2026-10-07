@@ -1,0 +1,35 @@
+[
+  {
+    "time_ms": 233835,
+    "owner": "c03",
+    "note": 69,
+    "velocity": 100,
+    "extra": 2,
+    "attack_ms": 0
+  },
+  {
+    "time_ms": 233836,
+    "owner": "c04",
+    "note": 69,
+    "retrigger": 1,
+    "velocity": 100,
+    "extra": 0,
+    "attack_ms": 233836
+  },
+  {
+    "time_ms": 234000,
+    "owner": "c04",
+    "note": 69,
+    "retrigger": 0,
+    "velocity": 100,
+    "extra": 0,
+    "attack_ms": 233836
+  },
+  {
+    "velocity": 0,
+    "owner": "none",
+    "note": 0,
+    "time_ms": 235000,
+    "extra": 15
+  }
+]

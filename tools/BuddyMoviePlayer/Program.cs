@@ -11,6 +11,8 @@ static class Program
   if(args.Length==3&&args[0]=="--pace-test") {PaceTest.Run(args[1],args[2]);return;}
   if(args.Length==3&&args[0]=="--pit-contract-test") {PitContractTest.Run(args[1],args[2]);return;}
   if(args.Length==3&&args[0]=="--pit-contract-test-headless") {PitContractTest.Run(args[1],args[2],false);return;}
+  if(args.Length==3&&args[0]=="--gain-contract-test") {GainContractTest.Run(args[1],args[2]);return;}
+  if(args.Length==3&&args[0]=="--gain-contract-test-headless") {GainContractTest.Run(args[1],args[2],false);return;}
   Application.Run(new Player(args.FirstOrDefault()));
  }
 }
@@ -41,15 +43,15 @@ public sealed class Player : Form
   foreach(var b in new[]{open,play,replay,full}) {b.BackColor=Color.FromArgb(48,58,76);b.ForeColor=Color.White;b.FlatStyle=FlatStyle.Flat;}
   var seekPanel=new Panel{Dock=DockStyle.Bottom,Height=38};seekPanel.Controls.Add(seek);
   Controls.Add(screen);Controls.Add(caption);Controls.Add(seekPanel);Controls.Add(controls);
-  open.Click+=async(_,_)=>{if(movie?.RequiresPit==true)StopOwnedAudio();using var dialog=new OpenFileDialog{Filter="Buddy movie or score (*.wzv;*.wzm)|*.wzv;*.wzm",CheckFileExists=true};if(dialog.ShowDialog(this)==DialogResult.OK)await OpenAsync(dialog.FileName);};
+  open.Click+=async(_,_)=>{if(movie?.RequiresPit==true||movie?.RequiresGain==true)StopOwnedAudio();using var dialog=new OpenFileDialog{Filter="Buddy movie or score (*.wzv;*.wzm)|*.wzv;*.wzm",CheckFileExists=true};if(dialog.ShowDialog(this)==DialogResult.OK)await OpenAsync(dialog.FileName);};
   pit.CheckedChanged+=(_,_)=>{if(!pit.Checked&&movie?.RequiresPit==true){StopOwnedAudio();status.Text="PIT voice disabled; enable it to play this bundle.";}};
-  Deactivate+=(_,_)=>{if(movie?.RequiresPit==true)StopOwnedAudio();};
+  Deactivate+=(_,_)=>{if(movie?.RequiresPit==true||movie?.RequiresGain==true)StopOwnedAudio();};
   Microsoft.Win32.SystemEvents.SessionSwitch+=SessionChanged;
   play.Click+=(_,_)=>Toggle();replay.Click+=(_,_)=>{SeekTo(0);if(!playing)Toggle();};full.Click+=(_,_)=>Fullscreen();
   seek.Scroll+=(_,_)=>{if(!updating&&movie!=null)SeekTo((int)((long)seek.Value*movie.Duration/1000));};
   volume.ValueChanged+=(_,_)=>{if(playing){position=audio.Milliseconds;Restart();}};
   timer.Tick+=(_,_)=>TickPlayback();timer.Start();
-  KeyDown+=(_,e)=>{if(e.KeyCode==Keys.Space){Toggle();e.Handled=e.SuppressKeyPress=true;}else if(e.KeyCode==Keys.F11){Fullscreen();e.Handled=true;}else if(e.KeyCode==Keys.Escape){if(movie?.RequiresPit==true)StopOwnedAudio();if(fullscreen)Fullscreen();e.Handled=true;}else if(e.KeyCode==Keys.Left)SeekTo(Math.Max(0,position-5000));else if(e.KeyCode==Keys.Right&&movie!=null)SeekTo(Math.Min(movie.Duration,position+5000));};
+  KeyDown+=(_,e)=>{if(e.KeyCode==Keys.Space){Toggle();e.Handled=e.SuppressKeyPress=true;}else if(e.KeyCode==Keys.F11){Fullscreen();e.Handled=true;}else if(e.KeyCode==Keys.Escape){if(movie?.RequiresPit==true||movie?.RequiresGain==true)StopOwnedAudio();if(fullscreen)Fullscreen();e.Handled=true;}else if(e.KeyCode==Keys.Left)SeekTo(Math.Max(0,position-5000));else if(e.KeyCode==Keys.Right&&movie!=null)SeekTo(Math.Min(movie.Duration,position+5000));};
   Shown+=async(_,_)=>{if(initial!=null)await OpenAsync(initial);};
  }
  public async Task OpenAsync(string path,bool showErrors=true) {
@@ -62,8 +64,8 @@ public sealed class Player : Form
  public void Toggle() {if(movie==null||loading||closed)return;if(playing) {position=audio.Milliseconds;audio.Stop();playing=false;play.Text="Play";}else{if(position>=movie.Duration)position=0;Restart();}DrawFrame();}
  void Restart() {if(movie?.RequiresPit==true&&!pit.Checked){status.Text="Enable PIT voice to play this bundle.";return;}try {audio.Start(samples,position,volume.Value/100.0);playing=true;play.Text="Pause";}catch(Exception ex){playing=false;audio.Stop();status.Text=ex.Message;}}
  public void StopOwnedAudio() {try{if(playing)position=Math.Min(movie?.Duration??position,audio.Milliseconds);}catch(IOException ex){status.Text=ex.Message;}finally{audio.Stop();playing=false;play.Text="Play";}}
- void SessionChanged(object sender,Microsoft.Win32.SessionSwitchEventArgs e) {if(closed||IsDisposed||Disposing)return;if(InvokeRequired){try{BeginInvoke(()=>SessionChanged(sender,e));}catch(InvalidOperationException){}return;}if(movie?.RequiresPit==true)StopOwnedAudio();}
- protected override void WndProc(ref Message m) {if(movie?.RequiresPit==true&&(m.Msg==0x2B1||m.Msg==0x11||m.Msg==0x16))StopOwnedAudio();base.WndProc(ref m);}
+ void SessionChanged(object sender,Microsoft.Win32.SessionSwitchEventArgs e) {if(closed||IsDisposed||Disposing)return;if(InvokeRequired){try{BeginInvoke(()=>SessionChanged(sender,e));}catch(InvalidOperationException){}return;}if(movie?.RequiresPit==true||movie?.RequiresGain==true)StopOwnedAudio();}
+ protected override void WndProc(ref Message m) {if((movie?.RequiresPit==true||movie?.RequiresGain==true)&&(m.Msg==0x2B1||m.Msg==0x11||m.Msg==0x16))StopOwnedAudio();base.WndProc(ref m);}
  public void SeekTo(int ms) {if(movie==null||loading||closed)return;bool resume=playing;audio.Stop();playing=false;position=Math.Clamp(ms,0,movie.Duration);if(resume&&position<movie.Duration)Restart();else play.Text="Play";DrawFrame();}
  public void TickPlayback() {if(movie==null||!playing)return;try {position=audio.Completed?movie.Duration:Math.Min(movie.Duration,audio.Milliseconds);if(position>=movie.Duration) {playing=false;audio.Stop();play.Text="Play";}DrawFrame();}catch(Exception ex){audio.Stop();playing=false;play.Text="Play";status.Text=ex.Message;}}
  void DrawFrame() {

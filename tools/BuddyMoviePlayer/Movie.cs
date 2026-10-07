@@ -6,17 +6,20 @@ public record Score(int Time, byte[] Notes, byte[] Velocities, byte Retrigger);
 public record Instrument(int Time, byte[] Programs);
 public record Speech(int Start, int End, byte[] Samples);
 public record PitNote(int Time, byte Note, bool Attack);
+public record Gain(int Time, byte[] Steps);
 
 public sealed class Movie : IDisposable
 {
     public FileStream? Video { get; private set; }
     public bool HasVideo => Video != null;
     public bool RequiresPit { get; private set; }
+    public bool RequiresGain { get; private set; }
     public int Width, Height, Fps, Frames, Duration, FrameBytes;
     public readonly List<Score> Scores = [];
     public readonly List<Instrument> Instruments = [];
     public readonly List<Speech> Speeches = [];
     public readonly List<PitNote> PitNotes = [];
+    public readonly List<Gain> Gains = [];
     public readonly List<(int Time, string Text)> Captions = [];
     public bool Vibrato;
 
@@ -47,27 +50,34 @@ public sealed class Movie : IDisposable
             if (audioOnly)
             {
                 music = Read(path, 140020);
-                Require(music.Length >= 20 && (Magic(music, "WZM1") || Magic(music, "WZM2")), "Unsupported WZM header.");
+                Require(music.Length >= 20 && (Magic(music, "WZM1") || Magic(music, "WZM2") || Magic(music,"WZM3")), "Unsupported WZM header.");
                 RequiresPit = Magic(music, "WZM2");
+                RequiresGain = Magic(music,"WZM3");
                 Duration = I32(music, 12);
                 Require(Duration > 0 && Duration <= 600000, "Invalid music duration.");
                 if (File.Exists(Side(".WZV"))) LoadVideo(Side(".WZV"), true);
             }
             else LoadVideo(path, false);
 
-            Require(RequiresPit || (!File.Exists(pitMarker) && !File.Exists(Side(".WZP"))),
-                "Legacy WZV2/WZM1 cannot contain PIT.REQ or a PIT sidecar.");
-            ValidateDirectory(folder, basename);
-            if (RequiresPit)
+            string gainMarker=Path.Combine(folder,"GAIN.REQ");
+            if(RequiresGain)
             {
-                Require(File.Exists(pitMarker) && Read(pitMarker, 4).SequenceEqual(Encoding.ASCII.GetBytes("WZP1")),
-                    "PIT-required movie needs exact PIT.REQ=WZP1.");
-                Require(File.Exists(Side(".WZM")) && File.Exists(Side(".WZP")), "PIT-required movie needs matching WZM2 and WZP1 files.");
+                Require(File.Exists(Side(".WZM"))&&File.Exists(Side(".WZI"))&&File.Exists(Side(".WZG")),"Gain family requires matching WZM3, WZI1 and WZG1; video-only fallback is forbidden.");
+                Require(File.Exists(gainMarker)&&Read(gainMarker,4).SequenceEqual(Encoding.ASCII.GetBytes("WZG1")),"Gain family requires exact GAIN.REQ=WZG1.");
+                Require(File.Exists(Path.Combine(folder,"INST.REQ")),"Gain family requires INST.REQ.");
             }
+            else Require(!File.Exists(gainMarker)&&!File.Exists(Side(".WZG")),"Old families cannot contain gain artifacts.");
             if (music != null || File.Exists(Side(".WZM")))
                 LoadMusic(music ?? Read(Side(".WZM"), 140020));
             LoadInstruments(Side(".WZI"), Path.Combine(folder, "INST.REQ"));
-            if (RequiresPit) LoadPit(Read(Side(".WZP"), 80016));
+            if (RequiresPit) {
+                Require(File.Exists(pitMarker)&&Read(pitMarker,4).SequenceEqual(Encoding.ASCII.GetBytes("WZP1")),"PIT-required movie needs exact PIT.REQ=WZP1.");
+                Require(File.Exists(Side(".WZM"))&&File.Exists(Side(".WZP")),"PIT-required movie needs matching music and WZP1 files.");
+                LoadPit(Read(Side(".WZP"), 80016));
+            }
+            else Require(!File.Exists(pitMarker)&&!File.Exists(Side(".WZP")),"PIT artifacts are present without a required PIT declaration.");
+            ValidateDirectory(folder, basename);
+            if(RequiresGain)LoadGain(Read(Side(".WZG"),80020));
             if (File.Exists(Side(".CUE")))
             {
                 byte[] b = Read(Side(".CUE"), 16);
@@ -89,9 +99,11 @@ public sealed class Movie : IDisposable
         byte[] h = new byte[24];
         Video.ReadExactly(h);
         bool videoPit = Magic(h, "WZV3");
-        Require(Magic(h, "WZV2") || videoPit, "Unsupported WZV header. Expected WZV2 or PIT-required WZV3.");
-        Require(!matchMusic || (videoPit == RequiresPit && I32(h, 16) == Duration), "Video/music versions or durations do not match.");
+        bool videoGain=Magic(h,"WZV4");
+        Require(Magic(h, "WZV2") || videoPit || videoGain, "Unsupported WZV header. Expected WZV2, WZV3 or gain-required WZV4.");
+        Require(!matchMusic || (videoPit == RequiresPit && videoGain==RequiresGain && I32(h, 16) == Duration), "Video/music versions or durations do not match.");
         RequiresPit = videoPit;
+        RequiresGain = videoGain;
         Width = U16(h, 4); Height = U16(h, 6); Fps = U16(h, 8);
         Frames = I32(h, 12); Duration = I32(h, 16); FrameBytes = Width * Height / 2;
         Require(U16(h, 10) == 24 && Width >= 4 && Width <= 320 && Width % 4 == 0 && Height >= 1 && Height <= 200 && Fps is 2 or 4 or 8 && I32(h, 20) == FrameBytes, "Invalid WZV video header.");
@@ -102,38 +114,38 @@ public sealed class Movie : IDisposable
     void ValidateDirectory(string folder, string basename)
     {
         string[] files = Directory.GetFiles(folder);
-        if (RequiresPit)
+        if (RequiresPit || RequiresGain)
         {
             Require(!files.GroupBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase).Any(g => g.Count() > 1), "Duplicate case-insensitive bundle files.");
             foreach (string file in files.Where(f => Path.GetExtension(f).Equals(".REQ", StringComparison.OrdinalIgnoreCase)))
-                Require(Path.GetFileName(file).Equals("PIT.REQ", StringComparison.OrdinalIgnoreCase) || Path.GetFileName(file).Equals("INST.REQ", StringComparison.OrdinalIgnoreCase), "Unknown required marker: " + Path.GetFileName(file));
+                Require(Path.GetFileName(file).Equals("PIT.REQ", StringComparison.OrdinalIgnoreCase) || Path.GetFileName(file).Equals("INST.REQ", StringComparison.OrdinalIgnoreCase) || (RequiresGain&&Path.GetFileName(file).Equals("GAIN.REQ",StringComparison.OrdinalIgnoreCase)), "Unknown required marker: " + Path.GetFileName(file));
         }
         foreach (string file in files)
         {
             string ext = Path.GetExtension(file).ToUpperInvariant();
             if (!ext.StartsWith(".WZ")) continue;
             bool matching = Path.GetFileNameWithoutExtension(file).Equals(basename, StringComparison.OrdinalIgnoreCase);
-            if (RequiresPit) Require(matching, "PIT-marked directory must contain one matching bundle basename.");
-            if (matching) Require(ext is ".WZV" or ".WZM" or ".WZI" || (RequiresPit && ext == ".WZP"), "Unsupported sidecar: " + Path.GetFileName(file));
+            if (RequiresPit || RequiresGain) Require(matching, "Required-feature directory must contain one matching bundle basename.");
+            if (matching) Require(ext is ".WZV" or ".WZM" or ".WZI" || (RequiresPit && ext == ".WZP") || (RequiresGain&&ext==".WZG"), "Unsupported sidecar: " + Path.GetFileName(file));
         }
     }
 
     void LoadMusic(byte[] b)
     {
-        Require(b.Length >= 20 && Magic(b, RequiresPit ? "WZM2" : "WZM1") && U16(b, 4) == 20 && U16(b, 6) == 14 && I32(b, 12) == Duration && I32(b, 16) == 0, "Invalid, mixed-version or mismatched WZM header.");
+        Require(b.Length >= 20 && Magic(b, RequiresGain?"WZM3":RequiresPit ? "WZM2" : "WZM1") && U16(b, 4) == 20 && U16(b, 6) == 14 && I32(b, 12) == Duration && I32(b, 16) == 0, "Invalid, mixed-version or mismatched WZM header.");
         int n = I32(b, 8);
-        Require(n >= (RequiresPit ? 2 : 1) && n <= 10000 && b.Length == checked(20 + n * 14), "Invalid WZM length/count.");
+        Require(n >= (RequiresPit || RequiresGain ? 2 : 1) && n <= 10000 && b.Length == checked(20 + n * 14), "Invalid WZM length/count.");
         int previous = -1;
         for (int p = 20; p < b.Length; p += 14)
         {
             int time = I32(b, p);
-            Require(time > previous && time <= Duration && (!RequiresPit || p != 20 || time == 0) && (b[p + 12] & 240) == 0 && b[p + 13] == 0, "Invalid WZM time or flags.");
+            Require(time > previous && time <= Duration && (!(RequiresPit||RequiresGain) || p != 20 || time == 0) && (b[p + 12] & 240) == 0 && b[p + 13] == 0, "Invalid WZM time or flags.");
             byte[] notes = b[(p + 4)..(p + 8)], velocities = b[(p + 8)..(p + 12)];
             for (int i = 0; i < 4; i++)
                 Require(velocities[i] <= 127 && ((notes[i] == 0 && velocities[i] == 0) || (velocities[i] > 0 && notes[i] >= (i == 3 ? 35 : 45) && notes[i] <= (i == 3 ? 81 : 96))), "Invalid WZM note/velocity.");
             Scores.Add(new(time, notes, velocities, b[p + 12])); previous = time;
         }
-        Require(!RequiresPit || (previous == Duration && b.AsSpan(b.Length - 10).IndexOfAnyExcept((byte)0) < 0), "WZM2 must end at duration with an all-zero final state.");
+        Require(!(RequiresPit||RequiresGain) || (previous == Duration && b.AsSpan(b.Length - 10).IndexOfAnyExcept((byte)0) < 0), "Required-feature music must end at duration with an all-zero final state.");
     }
 
     void LoadInstruments(string path, string marker)
@@ -141,7 +153,8 @@ public sealed class Movie : IDisposable
         if (File.Exists(marker)) Require(Read(marker, 4).SequenceEqual(Encoding.ASCII.GetBytes("WZI1")) && File.Exists(path), "INST.REQ requires a valid WZI1 sidecar.");
         if (!File.Exists(path)) return;
         Require(Scores.Count > 0, "WZI requires WZM music."); byte[] b = Read(path, 80020);
-        Require(b.Length >= 20 && Magic(b, "WZI1") && U16(b, 4) == 20 && U16(b, 6) == 8 && I32(b, 12) == Duration && (U16(b, 16) & 65534) == 0 && U16(b, 18) == 0x102, "Unsupported WZI version, flags or duration.");
+        Require(b.Length >= 20 && Magic(b, "WZI1") && U16(b, 4) == 20 && U16(b, 6) == 8 && I32(b, 12) == Duration && (U16(b, 16) & (RequiresGain?65528:65534)) == 0 && U16(b, 18) == 0x102, "Unsupported WZI version, flags or duration.");
+        if(RequiresGain){Require((U16(b,16)&2)!=0,"Gain family requires WZI gain flag 0x0002.");RequiresPit=(U16(b,16)&4)!=0;}
         int n = I32(b, 8);
         Require(n > 0 && n <= 10000 && b.Length == checked(20 + n * 8), "Invalid WZI length.");
         Vibrato = (U16(b, 16) & 1) != 0; int previous = -1;
@@ -168,6 +181,15 @@ public sealed class Movie : IDisposable
             PitNotes.Add(new(time, note, flags == 1)); previous = time;
         }
         Require(previous == Duration && PitNotes[^1].Note == 0 && !PitNotes[^1].Attack, "WZP1 requires final off at duration.");
+    }
+
+    void LoadGain(byte[] b)
+    {
+        Require(b.Length>=20&&Magic(b,"WZG1")&&U16(b,4)==20&&U16(b,6)==8&&I32(b,12)==Duration&&I32(b,16)==0,"Invalid WZG1 header/duration/reserved field.");
+        int count=I32(b,8);Require(count>=2&&count<=10000&&b.Length==checked(20+count*8),"Invalid WZG1 count/length.");
+        int previous=-1;
+        for(int p=20;p<b.Length;p+=8){int time=I32(b,p);byte[] steps=b[(p+4)..(p+8)];Require(time>previous&&time<=Duration&&(p!=20||time==0)&&steps.All(x=>x<=15),"Invalid WZG1 time or attenuation.");Gains.Add(new(time,steps));previous=time;}
+        Require(previous==Duration&&Gains[^1].Steps.All(x=>x==15),"WZG1 must end at duration with all lanes muted.");
     }
 
     void LoadCaptions(byte[] b)

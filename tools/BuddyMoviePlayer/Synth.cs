@@ -1,4 +1,5 @@
 namespace BuddyMoviePlayer;
+public record SynthSnapshot(int Time,byte[] Notes,byte[] Velocities,int[] Presets,int[] Attacks,byte[] Extra,int[] EnvelopeAttenuations,int[] EffectiveAttenuations,double[] TonePhase,int NoiseState);
 public static class Synth
 {
  public const int Rate=24000;
@@ -18,12 +19,12 @@ public static class Synth
   if(vibrato&&elapsed>=8&&preset is 3 or 4 or 5)period=Math.Clamp(period+Motion[elapsed&7]*(period>>8),1,1023);
   return(period,Math.Min(15,curve+baseAtten));
  }
- public static short[] Render(Movie movie,bool includePsg=true,bool includePit=true,bool includeSpeech=true)
+ public static short[] Render(Movie movie,bool includePsg=true,bool includePit=true,bool includeSpeech=true,Action<SynthSnapshot>? observe=null)
  {
   short[] output=new short[movie.Duration*(Rate/1000)];byte[] notes=new byte[4],vel=new byte[4],programs=new byte[3];
   int[] attack=new int[4],preset=new int[4],period=new int[4],atten=new int[4];double[] phase=new double[3];int score=0,inst=0,speech=0,lfsr=0x4000;double noisePhase=0;
-  bool expressive=movie.Instruments.Count>0;int pitIndex=0,pitNote=0,pitDivisor=0;long pitPhase=0;
-  for(int sample=0;sample<output.Length;sample++) {
+  bool expressive=movie.Instruments.Count>0;int pitIndex=0,pitNote=0,pitDivisor=0,gain=0;byte[] extra=new byte[4];long pitPhase=0;
+  for(int sample=0;sample<=output.Length;sample++) {
    int ms=sample/(Rate/1000);
    while(pitIndex<movie.PitNotes.Count&&movie.PitNotes[pitIndex].Time<=ms) {
     var p=movie.PitNotes[pitIndex++];
@@ -41,11 +42,15 @@ public static class Synth
      else {preset[i]=notes[i] is 35 or 36?8:notes[i] is 42 or 44 or 46?10:9;period[i]=notes[i] is 35 or 36?2:notes[i] is 38 or 40?5:notes[i] is 42 or 44 or 46?4:6;lfsr=0x4000;noisePhase=0;}
     }
    }
+   while(gain<movie.Gains.Count&&movie.Gains[gain].Time<=ms)extra=movie.Gains[gain++].Steps;
+   if(observe!=null&&sample%(Rate/1000)==0){int[] env=new int[4],effective=new int[4];for(int i=0;i<4;i++){env[i]=notes[i]==0?15:expressive?Envelope(preset[i],atten[i],period[i],attack[i],ms,i<3&&movie.Vibrato).Attenuation:atten[i];effective[i]=Math.Min(15,env[i]+extra[i]);}observe(new(ms,(byte[])notes.Clone(),(byte[])vel.Clone(),(int[])preset.Clone(),(int[])attack.Clone(),(byte[])extra.Clone(),env,effective,(double[])phase.Clone(),lfsr));}
+   if(sample==output.Length)break;
    double mix=0;
    for(int i=0;includePsg&&i<4;i++) {
     if(notes[i]==0)continue;
     var e=expressive?Envelope(preset[i],atten[i],period[i],attack[i],ms,i<3&&movie.Vibrato):(period[i],atten[i]);
-    double amplitude=e.Item2==15?0:Math.Pow(10,-e.Item2/10.0)*0.19;
+    int effective=Math.Min(15,e.Item2+extra[i]);
+    double amplitude=effective==15?0:Math.Pow(10,-effective/10.0)*0.19;
     if(i<3) {phase[i]+=3579545.0/(32*e.Item1*Rate);phase[i]-=Math.Floor(phase[i]);mix+=(phase[i]<0.5?1:-1)*amplitude;}
     else {noisePhase+=3579545.0/((512<<(period[i]&3))*Rate);while(noisePhase>=1) {noisePhase--;int feedback=(period[i]&4)!=0?(lfsr^(lfsr>>1))&1:lfsr&1;lfsr=(lfsr>>1)|(feedback<<14);}mix+=((lfsr&1)!=0?1:-1)*amplitude;}
    }

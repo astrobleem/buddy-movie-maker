@@ -19,6 +19,24 @@ this player's output. Re-enable/resume explicitly after returning to the player.
 
 ## Supported contract
 
+Local WZG1 revision 1 extension: gain-required movies use WZV4/WZM3 and require
+WZI1 gain flag 2, matching WZG1, exact INST.REQ and GAIN.REQ. WZI flag 4 separately
+declares required PIT, including empty/all-rest streams; stripping PIT files
+cannot remove that declaration. Mixed/partial/unknown members refuse before
+rendering or audio acquisition. Audio-only WZM3 is supported; included video
+must match WZV4. There is no silent video-only fallback for a required bundle.
+
+WZG holds a complete four-lane extra-attenuation snapshot, default zero, added
+once after velocity/envelope attenuation and clamped at silence 15. It leaves
+attack age/preset/velocity, tone/vibrato phase and noise state intact. Gain events
+take effect at their millisecond boundary without waiting for the 55 ms envelope
+quantum. Expired envelopes cannot revive. PIT and speech PCM are unaffected.
+Logical rests remain mandatory for speech and completion; gain 15 is not rest.
+Crop origins use the supplied initial gain; this format carries no pre-origin
+attack age or phase. Whole-output seeks/replay preserve recorded attack history.
+Frozen MML1/2/3 no-gain contracts are unchanged. This candidate remains local;
+accepted players and public draft branches are not replaced.
+
 - Packed, uncompressed WZV2 video: includes legacy 64×48 at 4 fps and Maker
   256×160 at 4 fps; DOS bounds 4..320 width (multiple of four), 1..200 height,
   2/4/8 fps, at most 4,800 frames and 600 seconds. RGBI palette, high nibble first.
@@ -115,6 +133,15 @@ PIT plus three melodic PSG voices and noise. Generated synthetic WAV captures
 support listening review; device submission tests cannot prove audible quality.
 Actual file-dialog, keyboard, focus-loss and OS session-event behavior still
 requires manual desktop acceptance.
+
+`--gain-contract-test <Tests/GainContract/v1> <new-evidence-directory>` validates
+the exact frozen WZG pins, 254 files, 43 decisions, causal ordering, held fades,
+phase/noise continuity, crop state, owner handover and real waveOut seek/replay
+buffers including speech handoff. Append `-headless` to omit device/UI checks.
+`--pace-test synthetic-gain-pit <new-evidence-directory>` measures a 72-second
+gain/PIT/PSG/noise fixture with a 60-second wall-clock segment. Owner annotations
+are resolved by Maker; this player consumes physical-lane snapshots only.
+WZG contract source is `b447d64ab45a016be37ca010ae6ccce3e9c13b69`.
 
 The PIT contract is frozen Maker commit `280a043867ee5bbca0959ec3c4ba2029f5587758`,
 spec SHA256 `C47A115B936F67C21665A5C542CF1F0B1684DEEF3809E21C21BBCFEAF2860768`.

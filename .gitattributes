@@ -10,3 +10,5 @@ notices/* -text
 # Frozen cross-player contract bytes include checksummed text files.
 tools/BuddyMoviePlayer/Tests/PitContract/MML3.md -text
 tools/BuddyMoviePlayer/Tests/PitContract/v1/** -text
+tools/BuddyMoviePlayer/Tests/GainContract/WZG1.md -text
+tools/BuddyMoviePlayer/Tests/GainContract/v1/** -text
