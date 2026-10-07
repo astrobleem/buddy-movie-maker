@@ -19,7 +19,7 @@ this player's output. Re-enable/resume explicitly after returning to the player.
 
 ## Supported contract
 
-Local WZG1 revision 1 extension: gain-required movies use WZV4/WZM3 and require
+Experimental WZG1 revision 1 extension: gain-required movies use WZV4/WZM3 and require
 WZI1 gain flag 2, matching WZG1, exact INST.REQ and GAIN.REQ. WZI flag 4 separately
 declares required PIT, including empty/all-rest streams; stripping PIT files
 cannot remove that declaration. Mixed/partial/unknown members refuse before
@@ -34,8 +34,9 @@ quantum. Expired envelopes cannot revive. PIT and speech PCM are unaffected.
 Logical rests remain mandatory for speech and completion; gain 15 is not rest.
 Crop origins use the supplied initial gain; this format carries no pre-origin
 attack age or phase. Whole-output seeks/replay preserve recorded attack history.
-Frozen MML1/2/3 no-gain contracts are unchanged. This candidate remains local;
-accepted players and public draft branches are not replaced.
+Frozen MML1/2/3 no-gain contracts are unchanged. This experimental version is
+offered alongside the previously accepted player; source PRs remain identified
+separately, and manual desktop/listening acceptance is still pending.
 
 - Packed, uncompressed WZV2 video: includes legacy 64×48 at 4 fps and Maker
   256×160 at 4 fps; DOS bounds 4..320 width (multiple of four), 1..200 height,
