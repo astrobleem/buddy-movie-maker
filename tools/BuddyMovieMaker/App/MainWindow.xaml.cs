@@ -85,6 +85,15 @@ public partial class MainWindow : Window
         if(!SpeechGrid.CommitEdit(DataGridEditingUnit.Cell,true)||!SpeechGrid.CommitEdit(DataGridEditingUnit.Row,true))throw new ArgumentException("Finish editing speech start times (whole nonnegative milliseconds).");
         return speech.Select(s=>new SpeechRequest(s.Path,s.StartMs)).ToArray();
     }
+    void OwnerBrowse(object sender,RoutedEventArgs e){var path=Browse("Note ownership CSV|*.csv");if(path!=null)OwnerPath.Text=path;}
+    void GainBrowse(object sender,RoutedEventArgs e){var path=Browse("Cue automation CSV|*.csv");if(path!=null)GainPath.Text=path;}
+    (VerifiedOwnedMidi score,CueVolumePlan plan,int origin)? OwnedInputs()
+    {
+        if(OwnedGainBox.IsChecked!=true)return null;
+        if(string.IsNullOrWhiteSpace(MidiPath.Text)||!string.IsNullOrWhiteSpace(MmlPath.Text))throw new ArgumentException("Verified cue fades require the complete source MIDI, without an MML score.");
+        if(!int.TryParse(FilmOrigin.Text,out int origin)||origin<0||origin>86400000)throw new ArgumentException("Film origin must be whole nonnegative milliseconds within one day.");
+        return (MidiScore.VerifyOwnersCsv(MidiPath.Text,OwnerPath.Text),CueVolumePlan.FromCsv(GainPath.Text),origin);
+    }
     async void DecoderBrowse(object sender,RoutedEventArgs e)
     {
         var path=Browse("Existing FFmpeg executable|ffmpeg.exe");if(path==null)return;
@@ -115,7 +124,10 @@ public partial class MainWindow : Window
             var validated=MovieEngine.Captions(captions,info.DurationMs);
             if(!string.IsNullOrWhiteSpace(midi)&&!string.IsNullOrWhiteSpace(mml))throw new ArgumentException("Choose MIDI or MML, not both.");
             var expressive=!string.IsNullOrWhiteSpace(mml)?MmlScore.FromFile(mml,info.DurationMs,initialProgram,vibrato):null;
-            byte[]? music=expressive?.Music??(string.IsNullOrWhiteSpace(midi)?null:MidiScore.Convert(midi,info.DurationMs));
+            var owned=OwnedInputs();
+            var gainArrangement=owned is {} o?MidiScore.ArrangeOwned(o.score,o.plan,o.origin,info.DurationMs):null;
+            var midiArrangement=owned!=null||string.IsNullOrWhiteSpace(midi)?null:MidiScore.Arrange(midi,info.DurationMs);
+            byte[]? music=gainArrangement?.Music??expressive?.Music??midiArrangement?.Music;
             await SpeechAudio.Prepare(SpeechInputs(),info.DurationMs,music,ct,expressive?.Pit);
             string folder=Path.Combine(Path.GetTempPath(),"BuddyMaker-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
             bool accepted=false;
@@ -125,7 +137,8 @@ public partial class MainWindow : Window
                 await Task.Run(()=>MovieEngine.Convert(source,Path.Combine(folder,"MOVIE.WZV"),info,ct,progress,expressive?.Pit!=null),ct);
                 ct.ThrowIfCancellationRequested();DeletePreview();previewFolder=folder;preview=Path.Combine(folder,"MOVIE.WZV");movie=info;cues=validated;accepted=true;
                 Timeline.Maximum=info.Frames-1;Timeline.Value=0;Timeline.IsEnabled=PlayButton.IsEnabled=true;Placeholder.Visibility=Visibility.Collapsed;ShowFrame(0);
-                Status.Text=$"Ready: {info.DurationMs/1000.0:0.00}s, {info.Frames} frames. "+(info.HasAudio?"Video soundtrack omitted. ":"")+"Export uses the same conversion. "+(expressive?.Pit!=null?"Required [P] voice: silent preview; enable its checkbox for export.":"");
+                Status.Text=$"Ready: {info.DurationMs/1000.0:0.00}s, {info.Frames} frames. "+(info.HasAudio?"Video soundtrack omitted. ":"")+"Export uses the same conversion. "+(expressive?.Pit!=null?"Required [P] voice: silent preview; enable its checkbox for export.":midiArrangement?.Report.Summary??"");
+                if(gainArrangement!=null)Status.Text+=$"Verified cue fades; {gainArrangement.Report.VerifiedSourceNotes} matched notes; {gainArrangement.Report.ClippedHeldSeeds} cropped held seeds. Preview is silent.";
             }
             finally{if(!accepted)Directory.Delete(folder,true);}
         });
@@ -143,7 +156,9 @@ public partial class MainWindow : Window
             var progress=new Progress<double>(v=>Progress.Value=v);
             var clips=SpeechInputs();
             var range=RangeInputs();sourceInfo=await MovieEngine.ProbeSource(source,ct);UpdateSelection();MovieEngine.Select(sourceInfo,range.start,range.end);
-            await Task.Run(()=>MovieEngine.Export(source,midi,captions,destination,ct,progress,clips,mml,initialProgram,vibrato,range.start,range.end,pitEnabled),ct);
+            var owned=OwnedInputs();
+            if(owned is {} o)await Task.Run(()=>OwnedMovieExport.Export(source,o.score,o.plan,destination,ct,o.origin,captions,range.start,range.end,progress,clips),ct);
+            else await Task.Run(()=>MovieEngine.Export(source,midi,captions,destination,ct,progress,clips,mml,initialProgram,vibrato,range.start,range.end,pitEnabled),ct);
             Status.Text="Export complete: "+destination+". Copy the whole folder and run PLAY on your Tandy.";
         });
     }

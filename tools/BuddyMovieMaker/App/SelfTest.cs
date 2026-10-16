@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -38,7 +39,12 @@ public static class SelfTest
             File.Copy(Path.Combine(selected,"ffmpeg.exe"),Path.Combine(alternate,"ffmpeg.exe"));File.Copy(Path.Combine(selected,"ffprobe.exe"),Path.Combine(alternate,"ffprobe.exe"));
             using(var changed=Launch("save",Path.Combine(output,"SETTINGS-ALTERNATE.json"),alternate))Check(changed.RootElement.GetProperty("decoder").GetString()==alternate,"Alternate not selected.");
             using(var restored=Launch("restore",Path.Combine(output,"SETTINGS-ALTERNATE-RESTORE.json"),selected))Check(restored.RootElement.GetProperty("decoder").GetString()==alternate,"Alternate not remembered.");
-            string before=File.ReadAllText(settings);File.Delete(Path.Combine(alternate,"ffprobe.exe"));
+            // Model a remembered folder that became incomplete without deleting a
+            // decoder executable. The complete alternate clone stays untouched.
+            string incomplete=Path.Combine(output,"INCOMPLETE-DECODER");Directory.CreateDirectory(incomplete);
+            File.Copy(Path.Combine(selected,"ffmpeg.exe"),Path.Combine(incomplete,"ffmpeg.exe"));
+            File.WriteAllText(settings,JsonSerializer.Serialize(new{Version=1,DecoderDirectory=incomplete}));
+            string before=File.ReadAllText(settings);
             using(var missing=Launch("restore",Path.Combine(output,"SETTINGS-MISSING.json"),selected))Check(missing.RootElement.GetProperty("decoder").ValueKind==JsonValueKind.Null&&missing.RootElement.GetProperty("status").GetString()!.Contains("unavailable"),"Missing pair did not fall back.");
             Check(File.ReadAllText(settings)==before,"Failed restore overwrote saved selection.");
             using(var recovery=Launch("save",Path.Combine(output,"SETTINGS-RECOVERY.json"),selected))Check(recovery.RootElement.GetProperty("decoder").GetString()==selected,"Reselection failed.");
@@ -296,6 +302,14 @@ public static class SelfTest
         {
         var window=new MainWindow(new DecoderSettings(Path.Combine(output,"UI-SETTINGS.json")),false);window.Show();
         Test("native PIT enable starts unchecked",()=>Check(window.PitBox.IsChecked==false,"PIT enabled without explicit selection."));
+        Test("native owned gain starts unchecked and rejects incomplete ownership",()=>
+        {
+            Check(window.OwnedGainBox.IsChecked==false,"Owned gain enabled without explicit selection.");
+            var verify=typeof(MainWindow).GetMethod("OwnedInputs",BindingFlags.Instance|BindingFlags.NonPublic)!;
+            window.OwnedGainBox.IsChecked=true;
+            bool rejected=false;try{verify.Invoke(window,null);}catch(TargetInvocationException e){rejected=e.InnerException is ArgumentException;}
+            Check(rejected,"Owned gain accepted missing MIDI/annotation/automation inputs.");window.OwnedGainBox.IsChecked=false;
+        });
         Test("native range controls update duration and invalidate stale preview",()=>
         {
             window.SetSourceForTest(new(634.566667m,true));window.TrimStart.Text="20";window.TrimEnd.Text="22";

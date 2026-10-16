@@ -1,0 +1,2440 @@
+{
+  "contract": "MML3/PIT revision1",
+  "spec_sha256": "C47A115B936F67C21665A5C542CF1F0B1684DEEF3809E21C21BBCFEAF2860768",
+  "fixtures": "literal independent states and synthetic black frames; no production compiler invoked",
+  "cases": [
+    {
+      "name": "BASIC",
+      "kind": "authoring",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "REPEAT",
+      "kind": "authoring",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "REST",
+      "kind": "authoring",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "VZERO",
+      "kind": "authoring",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "ALLREST",
+      "kind": "authoring",
+      "duration_ms": 500,
+      "score_ms": 500,
+      "frames": 2,
+      "pit_records": 2,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "EMPTYP",
+      "kind": "authoring",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 2,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "NOPART",
+      "kind": "authoring",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 0,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": false,
+      "disabled_or_unavailable_playback": "legacy behavior; no PIT requirement"
+    },
+    {
+      "name": "CLIP",
+      "kind": "authoring",
+      "duration_ms": 900,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "MIXED",
+      "kind": "authoring",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "CARRIED",
+      "kind": "authoring",
+      "duration_ms": 496,
+      "score_ms": 496,
+      "frames": 2,
+      "pit_records": 17,
+      "source_accept": true,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "HOLD",
+      "kind": "reader",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": false,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "IMPLICIT",
+      "kind": "reader",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 3,
+      "source_accept": false,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "CATCHUP",
+      "kind": "reader",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 4,
+      "source_accept": false,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "GUARDOK",
+      "kind": "reader",
+      "duration_ms": 2000,
+      "score_ms": 2000,
+      "frames": 8,
+      "pit_records": 5,
+      "source_accept": false,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "COUNTOK",
+      "kind": "reader",
+      "duration_ms": 9999,
+      "score_ms": 9999,
+      "frames": 40,
+      "pit_records": 10000,
+      "source_accept": false,
+      "movie_accept": true,
+      "audio_accept": true,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "COUNTMAX",
+      "kind": "negative_bundle",
+      "duration_ms": 10000,
+      "score_ms": 10000,
+      "frames": 40,
+      "pit_records": 10001,
+      "source_accept": false,
+      "movie_accept": false,
+      "audio_accept": false,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "UNSORTED",
+      "kind": "negative_bundle",
+      "duration_ms": 1000,
+      "score_ms": 1000,
+      "frames": 4,
+      "pit_records": 4,
+      "source_accept": false,
+      "movie_accept": false,
+      "audio_accept": false,
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    },
+    {
+      "name": "VERSION",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "unknown WZP version",
+      "output_writes": 0
+    },
+    {
+      "name": "HFLAGS",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "unknown WZP header flags",
+      "output_writes": 0
+    },
+    {
+      "name": "RHDR",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "reserved WZP header",
+      "output_writes": 0
+    },
+    {
+      "name": "RREC",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "reserved WZP record",
+      "output_writes": 0
+    },
+    {
+      "name": "COUNT0",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "zero WZP count",
+      "output_writes": 0
+    },
+    {
+      "name": "COUNT1",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "one WZP count",
+      "output_writes": 0
+    },
+    {
+      "name": "PITCH44",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "pitch below range",
+      "output_writes": 0
+    },
+    {
+      "name": "PITCH97",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "pitch above range",
+      "output_writes": 0
+    },
+    {
+      "name": "RFLAGS",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "unknown record flags",
+      "output_writes": 0
+    },
+    {
+      "name": "OFFFLAG",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "off requests attack",
+      "output_writes": 0
+    },
+    {
+      "name": "FIRST1",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "first time is not zero",
+      "output_writes": 0
+    },
+    {
+      "name": "DUPTIME",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "duplicate time",
+      "output_writes": 0
+    },
+    {
+      "name": "NOFINAL",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "missing final note-off",
+      "output_writes": 0
+    },
+    {
+      "name": "END999",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "final time differs from duration",
+      "output_writes": 0
+    },
+    {
+      "name": "PASTEND",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "record after duration",
+      "output_writes": 0
+    },
+    {
+      "name": "ZERODUR",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "zero PIT duration",
+      "output_writes": 0
+    },
+    {
+      "name": "MISMATCH",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "PIT duration mismatch",
+      "output_writes": 0
+    },
+    {
+      "name": "TRUNC",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "truncated PIT record",
+      "output_writes": 0
+    },
+    {
+      "name": "TRAIL",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "PIT trailing byte",
+      "output_writes": 0
+    },
+    {
+      "name": "NOMARK",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "missing PIT marker",
+      "output_writes": 0
+    },
+    {
+      "name": "MARKVER",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "bad PIT marker tag",
+      "output_writes": 0
+    },
+    {
+      "name": "MARKLEN",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "PIT marker trailing newline",
+      "output_writes": 0
+    },
+    {
+      "name": "NOWZP",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "missing PIT sidecar",
+      "output_writes": 0
+    },
+    {
+      "name": "NOWZM",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "missing required WZM2",
+      "output_writes": 0
+    },
+    {
+      "name": "LOSTBOTH",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "PIT marker and sidecar missing; old version gates still mandatory",
+      "output_writes": 0
+    },
+    {
+      "name": "VIDEO2",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "legacy video with PIT artifacts",
+      "output_writes": 0
+    },
+    {
+      "name": "MUSIC1",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "legacy music with required PIT",
+      "output_writes": 0
+    },
+    {
+      "name": "MUSICEND",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "WZM2 final retrigger not zero",
+      "output_writes": 0
+    },
+    {
+      "name": "MUSICRSV",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "WZM2 final reserved not zero",
+      "output_writes": 0
+    },
+    {
+      "name": "MUSICNOT",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "WZM2 final note not zero",
+      "output_writes": 0
+    },
+    {
+      "name": "MUSICVEL",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "WZM2 final velocity not zero",
+      "output_writes": 0
+    },
+    {
+      "name": "MULTIPLE",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "directory contains multiple movie basenames",
+      "output_writes": 0
+    },
+    {
+      "name": "CROSSP",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "cross-basename PIT sidecar",
+      "output_writes": 0
+    },
+    {
+      "name": "CROSSM",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "cross-basename music sidecar",
+      "output_writes": 0
+    },
+    {
+      "name": "UNKNOWN",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "unknown WZ sidecar",
+      "output_writes": 0
+    },
+    {
+      "name": "REQUNK",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "unknown capability marker",
+      "output_writes": 0
+    },
+    {
+      "name": "GUARDOFF",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "PIT intersects 150ms guarded speech interval",
+      "output_writes": 0
+    },
+    {
+      "name": "GUARDON",
+      "kind": "negative_bundle",
+      "movie_accept": false,
+      "audio_accept": false,
+      "reason": "PIT intersects 150ms guarded speech interval",
+      "output_writes": 0
+    },
+    {
+      "name": "AUDIO",
+      "kind": "reader",
+      "movie_accept": false,
+      "audio_accept": true,
+      "reason": "audio-only WZM2/PIT bundle; no video",
+      "pit_required": true,
+      "disabled_or_unavailable_playback": "reject before output writes"
+    }
+  ],
+  "invalid_sources": [
+    {
+      "path": "BADMML/NOVERS.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/MML4.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/LATEVER.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/DUPPART.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/VOLUME.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/PRESET.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/LOWNOTE.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/HIGHNOTE.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/NOISEP.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/TIE.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/NEST3.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/EMPTY.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/ENDATT.BAD",
+      "source_accept": false,
+      "movie_ms": 400
+    },
+    {
+      "path": "BADMML/SRCLIMIT.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    },
+    {
+      "path": "BADMML/NOTELIM.BAD",
+      "source_accept": false,
+      "movie_ms": 600000
+    },
+    {
+      "path": "BADMML/DURLIMIT.BAD",
+      "source_accept": false,
+      "movie_ms": null
+    },
+    {
+      "path": "BADMML/TOKLIMIT.BAD",
+      "source_accept": false,
+      "movie_ms": 1000
+    }
+  ],
+  "files": [
+    {
+      "path": "ALLREST/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "ALLREST/MOVIE.WZI",
+      "size": 28,
+      "sha256": "FDD9E36BDB1434E5E3643D6DB50ABBB983DF5296565D90C14AC164DB09408387"
+    },
+    {
+      "path": "ALLREST/MOVIE.WZM",
+      "size": 48,
+      "sha256": "E1BED1B4EE8ABCCE9341501D7FE1CD4D8CF68695B258AAC468EF6EF16DD502D7"
+    },
+    {
+      "path": "ALLREST/MOVIE.WZP",
+      "size": 32,
+      "sha256": "C0AB408E7FFD7A97FD3E96EF8C10931F78EDC018AC11C6EBF7841840012C40BD"
+    },
+    {
+      "path": "ALLREST/MOVIE.WZV",
+      "size": 40984,
+      "sha256": "DC71C571B967A619C7B15B499A5CFE2DA02A2A33CFD1D3FAD1E2B5C2D3032874"
+    },
+    {
+      "path": "ALLREST/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "ALLREST/SCORE.MML",
+      "size": 17,
+      "sha256": "D72EF70EB6ACEA6E61FB764A4C5EA1BE7787B46CBEEB597B7789F1D43AADF280"
+    },
+    {
+      "path": "AUDIO/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "AUDIO/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "AUDIO/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "AUDIO/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "AUDIO/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "BADMML/DUPPART.BAD",
+      "size": 19,
+      "sha256": "301BB37B9E8D8D0EE368B8B617BC8A7FC6826D5FB9F74C032D7294269AD5B4D2"
+    },
+    {
+      "path": "BADMML/DURLIMIT.BAD",
+      "size": 25,
+      "sha256": "42F4A78563FC66BBD95DED7BD25E30C53155B3DE9B77544AAC0D026C2D13A00F"
+    },
+    {
+      "path": "BADMML/EMPTY.BAD",
+      "size": 9,
+      "sha256": "71E637B2B62A9B7B4779DAA61BDB67766D9D470D37A3F5DD8227008FE2FE749D"
+    },
+    {
+      "path": "BADMML/ENDATT.BAD",
+      "size": 15,
+      "sha256": "8CF990792021461B7011F4B523058CC75DB68223B4B3D94CD073938604487896"
+    },
+    {
+      "path": "BADMML/HIGHNOTE.BAD",
+      "size": 16,
+      "sha256": "610B25D6E642A5E6C78D723790D2544B024C535B37C88B481B839B159F09CFEE"
+    },
+    {
+      "path": "BADMML/LATEVER.BAD",
+      "size": 19,
+      "sha256": "B7F9B1A22EDAEF489F154033F6AFF47B128521B51037634547E89201D2639027"
+    },
+    {
+      "path": "BADMML/LOWNOTE.BAD",
+      "size": 15,
+      "sha256": "B346CCE8D06DD9E3B694B5359C09FD746F110AEA9C125ADCEE1E71236B23EA1D"
+    },
+    {
+      "path": "BADMML/MML4.BAD",
+      "size": 12,
+      "sha256": "09D8E86C0274F9C2ADC9CBB513F0EC0CFD3FD29079FDE640D953359942644C89"
+    },
+    {
+      "path": "BADMML/NEST3.BAD",
+      "size": 21,
+      "sha256": "D6A76D7F88F8E033652561DC2148F93B4A5E25E96E69F8C47E2F8A0F301D1101"
+    },
+    {
+      "path": "BADMML/NOISEP.BAD",
+      "size": 13,
+      "sha256": "F7E3CE9E8B267E73F1562A7047C1F68D7A282D196CCD80B92DD4B0686D8470B2"
+    },
+    {
+      "path": "BADMML/NOTELIM.BAD",
+      "size": 4115,
+      "sha256": "DA02C1F930839D94433CCEB45304929B40C5DB12076301AB9DFADDD3C56F82A1"
+    },
+    {
+      "path": "BADMML/NOVERS.BAD",
+      "size": 7,
+      "sha256": "9C31074B3B54269821EFD8BC3903471750EB3488019D3178E6A02B2492C656EF"
+    },
+    {
+      "path": "BADMML/PRESET.BAD",
+      "size": 18,
+      "sha256": "6B18EC89162DC5BE7D1E0256770EE18BD45E66F3387D376DFE562232BD5FDAA8"
+    },
+    {
+      "path": "BADMML/SRCLIMIT.BAD",
+      "size": 8203,
+      "sha256": "90971DC5149042BB3FFF263DAA63A0AB34EA4CDEDAE719441E79009E53D0388A"
+    },
+    {
+      "path": "BADMML/TIE.BAD",
+      "size": 15,
+      "sha256": "241049327A5FA8E5D1BC68BB92629D43B19F6B912DF24FBFF776F06A351C62F7"
+    },
+    {
+      "path": "BADMML/TOKLIMIT.BAD",
+      "size": 2230,
+      "sha256": "8A1852E0B41D467D4ED9954D87F7F8F0E9854325B4827F8758908DC57CF99681"
+    },
+    {
+      "path": "BADMML/VOLUME.BAD",
+      "size": 15,
+      "sha256": "225DBA0F7CB447C73D7A2CCB82B23D6F834360746B611799CCEADC078E3D9C68"
+    },
+    {
+      "path": "BASIC/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "BASIC/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "BASIC/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "BASIC/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "BASIC/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "BASIC/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "BASIC/SCORE.MML",
+      "size": 27,
+      "sha256": "9C8D18A4E880FBFD168F2872CC042FD7F6BA92C25D2DD857B5518BAA874B0C16"
+    },
+    {
+      "path": "CARRIED/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "CARRIED/MOVIE.WZI",
+      "size": 28,
+      "sha256": "DBE87B00625F543538D53AB537A3F7309BB0581773275F9D6E554E9CD6670001"
+    },
+    {
+      "path": "CARRIED/MOVIE.WZM",
+      "size": 48,
+      "sha256": "438CFCAC86FEFF9F36145D70415FAE0689B9957DB778F7D615240C00BBC9F92E"
+    },
+    {
+      "path": "CARRIED/MOVIE.WZP",
+      "size": 152,
+      "sha256": "FE00EDE611B640A9B55456127A0BF6418581C707F499F5CAE919011456C4B9DD"
+    },
+    {
+      "path": "CARRIED/MOVIE.WZV",
+      "size": 40984,
+      "sha256": "3120769DED4877C245E15354231D84082565CA3735A2F3F5AAEF36772475BF32"
+    },
+    {
+      "path": "CARRIED/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "CARRIED/SCORE.MML",
+      "size": 28,
+      "sha256": "4A6A7DE5A21F81575593930A368F1B9611C2FD7042C1676C9AF6EAD9B8E79DEE"
+    },
+    {
+      "path": "CATCHUP/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "CATCHUP/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "CATCHUP/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "CATCHUP/MOVIE.WZP",
+      "size": 48,
+      "sha256": "E1185168E2CBA3DF8D8E5EA2C21B01BB742471C3DEC37939496CB2F3785D0EF2"
+    },
+    {
+      "path": "CATCHUP/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "CATCHUP/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "CLIP/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "CLIP/MOVIE.WZI",
+      "size": 28,
+      "sha256": "999C9C34661173E74B52044D312E0E6CC9A084DA09D8E83AE9B467BBA80173E8"
+    },
+    {
+      "path": "CLIP/MOVIE.WZM",
+      "size": 48,
+      "sha256": "88F41B2178BBC12F46EB0F11486814A9EAE4B46789A25EC0FAAF1E963B57006F"
+    },
+    {
+      "path": "CLIP/MOVIE.WZP",
+      "size": 40,
+      "sha256": "339CEEB616C6702B219D69EB9DB2D3F38F683AB6B65377E0F1D5F2FD908028D0"
+    },
+    {
+      "path": "CLIP/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "BD4EA28DF71F40D691EF7AA3A142E6E2A7591A226A909B999D13766F995C976E"
+    },
+    {
+      "path": "CLIP/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "CLIP/SCORE.MML",
+      "size": 23,
+      "sha256": "E938183F76BD13F413A4EEA603038866D8A058D8CA7954DB5523332E10A54963"
+    },
+    {
+      "path": "COUNT0/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "COUNT0/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "COUNT0/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "COUNT0/MOVIE.WZP",
+      "size": 40,
+      "sha256": "6197C805CBEB0C6F2E16330B753545931B5C40F91C121701CFC47CE30E136259"
+    },
+    {
+      "path": "COUNT0/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "COUNT0/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "COUNT1/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "COUNT1/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "COUNT1/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "COUNT1/MOVIE.WZP",
+      "size": 40,
+      "sha256": "66B454720A5DB15B99AD1EC928C49566146BAFC1573AF442BBA6C2B9CFFA9174"
+    },
+    {
+      "path": "COUNT1/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "COUNT1/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "COUNTMAX/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "COUNTMAX/MOVIE.WZI",
+      "size": 28,
+      "sha256": "799D5325B4A55BE898B6D5DB750B4FEF233EAFE48AD2E05693D3E672A82BEB16"
+    },
+    {
+      "path": "COUNTMAX/MOVIE.WZM",
+      "size": 48,
+      "sha256": "5CE373B6F588F86CA053413B90D9EB60EF72B825528A40827A6937F4D1B403C1"
+    },
+    {
+      "path": "COUNTMAX/MOVIE.WZP",
+      "size": 80024,
+      "sha256": "5F9B9818721C20ACB7DDD03E3B4D0C99550223A6A30CD77B5C688D628EF1A73F"
+    },
+    {
+      "path": "COUNTMAX/MOVIE.WZV",
+      "size": 819224,
+      "sha256": "19F399796D8DB7212F9A36F81058D3EF1752F41FCDE5574D07F16DE9FCCBD613"
+    },
+    {
+      "path": "COUNTMAX/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "COUNTOK/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "COUNTOK/MOVIE.WZI",
+      "size": 28,
+      "sha256": "C1F1DFA2DE239FB23109967E545F04231171493211E253566301A77B57F7FC32"
+    },
+    {
+      "path": "COUNTOK/MOVIE.WZM",
+      "size": 48,
+      "sha256": "C6A10EEE1534CA7120D6910AE485DAD43EA2CA12558640F43F0D08300A0BE68A"
+    },
+    {
+      "path": "COUNTOK/MOVIE.WZP",
+      "size": 80016,
+      "sha256": "B6C56251A44C38023FC827404E5A4A8E07768347A89B3E294F471806E6A5AB4C"
+    },
+    {
+      "path": "COUNTOK/MOVIE.WZV",
+      "size": 819224,
+      "sha256": "B67DC6E58CBE79666C17352BD027E97BB3EF22446D45E3DEDE9FA5FF017E46C2"
+    },
+    {
+      "path": "COUNTOK/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "CROSSM/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "CROSSM/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "CROSSM/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "CROSSM/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "CROSSM/OTHER.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "CROSSM/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "CROSSP/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "CROSSP/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "CROSSP/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "CROSSP/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "CROSSP/OTHER.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "CROSSP/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "DUPTIME/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "DUPTIME/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "DUPTIME/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "DUPTIME/MOVIE.WZP",
+      "size": 40,
+      "sha256": "24B0D53266F57489BBA8FBB32F0501E9ED113AA0259E0BD3E09AFDE0C114EFD5"
+    },
+    {
+      "path": "DUPTIME/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "DUPTIME/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "EMPTYP/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "EMPTYP/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "EMPTYP/MOVIE.WZM",
+      "size": 62,
+      "sha256": "F0D7B2E913F52D29191AA51625ED6F3BFDBEC7F81782195427F2F7D61E1090C3"
+    },
+    {
+      "path": "EMPTYP/MOVIE.WZP",
+      "size": 32,
+      "sha256": "64DA1BA12CE17BDD3034E891E381029696AD89C5381B59AEB764718AFBDA7F7E"
+    },
+    {
+      "path": "EMPTYP/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "EMPTYP/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "EMPTYP/SCORE.MML",
+      "size": 31,
+      "sha256": "EAFCA1D646DD3BA5D0E96CD907D9AB56C09BC13A2DB02E68608BEF4043F43D09"
+    },
+    {
+      "path": "END999/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "END999/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "END999/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "END999/MOVIE.WZP",
+      "size": 40,
+      "sha256": "30945BE4CBFF4FCDB00840130DB803E3A65717E82289E62F7DA0BD2DCCD0D962"
+    },
+    {
+      "path": "END999/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "END999/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "FIRST1/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "FIRST1/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "FIRST1/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "FIRST1/MOVIE.WZP",
+      "size": 40,
+      "sha256": "33F7EACD7D25583945439641E87A7C44E1C52B9F1B0FF8B4170F88F34A55ADF8"
+    },
+    {
+      "path": "FIRST1/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "FIRST1/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "GUARDOFF/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "GUARDOFF/MOVIE.WZI",
+      "size": 28,
+      "sha256": "0B31FF74160BACFEBA458D47500B65FB17BF5316203F9665D21C53F6F7EBE350"
+    },
+    {
+      "path": "GUARDOFF/MOVIE.WZM",
+      "size": 48,
+      "sha256": "72342CAF6C100F5F9C8A0A43497B7B2D746ECAB98971DFD9D25D0B20DA00C5BE"
+    },
+    {
+      "path": "GUARDOFF/MOVIE.WZP",
+      "size": 56,
+      "sha256": "E0328A22E84B5DC2D096D65494FAF37568ED39506522F5B19BBA11F0698023C7"
+    },
+    {
+      "path": "GUARDOFF/MOVIE.WZV",
+      "size": 163864,
+      "sha256": "A916872E3D8EDD688C6C4F92DAAD4260711D2AA32F12A57A75B110542F37A20C"
+    },
+    {
+      "path": "GUARDOFF/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "GUARDOFF/SPEECH.PCM",
+      "size": 2420,
+      "sha256": "EEE16E6B8E1C8A029F81EA47C6C6BCD23814D20A369E6FBDA178729092302728"
+    },
+    {
+      "path": "GUARDOK/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "GUARDOK/MOVIE.WZI",
+      "size": 28,
+      "sha256": "0B31FF74160BACFEBA458D47500B65FB17BF5316203F9665D21C53F6F7EBE350"
+    },
+    {
+      "path": "GUARDOK/MOVIE.WZM",
+      "size": 48,
+      "sha256": "72342CAF6C100F5F9C8A0A43497B7B2D746ECAB98971DFD9D25D0B20DA00C5BE"
+    },
+    {
+      "path": "GUARDOK/MOVIE.WZP",
+      "size": 56,
+      "sha256": "410A5215F978176016E772DAEE2F86E9F386B07D50709C1D93BEAC4685008260"
+    },
+    {
+      "path": "GUARDOK/MOVIE.WZV",
+      "size": 163864,
+      "sha256": "A916872E3D8EDD688C6C4F92DAAD4260711D2AA32F12A57A75B110542F37A20C"
+    },
+    {
+      "path": "GUARDOK/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "GUARDOK/SPEECH.PCM",
+      "size": 2420,
+      "sha256": "EEE16E6B8E1C8A029F81EA47C6C6BCD23814D20A369E6FBDA178729092302728"
+    },
+    {
+      "path": "GUARDON/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "GUARDON/MOVIE.WZI",
+      "size": 28,
+      "sha256": "0B31FF74160BACFEBA458D47500B65FB17BF5316203F9665D21C53F6F7EBE350"
+    },
+    {
+      "path": "GUARDON/MOVIE.WZM",
+      "size": 48,
+      "sha256": "72342CAF6C100F5F9C8A0A43497B7B2D746ECAB98971DFD9D25D0B20DA00C5BE"
+    },
+    {
+      "path": "GUARDON/MOVIE.WZP",
+      "size": 56,
+      "sha256": "E4572436B17291A833F65B037954DD278880706CF971F7A44AF0E84A842053BF"
+    },
+    {
+      "path": "GUARDON/MOVIE.WZV",
+      "size": 163864,
+      "sha256": "A916872E3D8EDD688C6C4F92DAAD4260711D2AA32F12A57A75B110542F37A20C"
+    },
+    {
+      "path": "GUARDON/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "GUARDON/SPEECH.PCM",
+      "size": 2420,
+      "sha256": "EEE16E6B8E1C8A029F81EA47C6C6BCD23814D20A369E6FBDA178729092302728"
+    },
+    {
+      "path": "HFLAGS/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "HFLAGS/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "HFLAGS/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "HFLAGS/MOVIE.WZP",
+      "size": 40,
+      "sha256": "CBF8DD6C443CC402F866BA3942F2EAAC2C2D7DF524CD718DC310BE5446C82174"
+    },
+    {
+      "path": "HFLAGS/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "HFLAGS/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "HOLD/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "HOLD/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "HOLD/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "HOLD/MOVIE.WZP",
+      "size": 40,
+      "sha256": "8BD136C6F62E0613E2E7285BA5127433741E62F8F328A6B8E5B3141A9E495BF9"
+    },
+    {
+      "path": "HOLD/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "HOLD/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "IMPLICIT/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "IMPLICIT/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "IMPLICIT/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "IMPLICIT/MOVIE.WZP",
+      "size": 40,
+      "sha256": "F5095D1E33523CB4D263770E5A9ACE9B15950343596F9068C632F2461DDF02EC"
+    },
+    {
+      "path": "IMPLICIT/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "IMPLICIT/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "LOSTBOTH/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "LOSTBOTH/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "LOSTBOTH/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "LOSTBOTH/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MARKLEN/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MARKLEN/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MARKLEN/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "MARKLEN/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MARKLEN/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MARKLEN/PIT.REQ",
+      "size": 5,
+      "sha256": "1BDD5F30D4D3F342FF47889536BCFFDA379200107EFA4AB8031F502355ECF279"
+    },
+    {
+      "path": "MARKVER/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MARKVER/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MARKVER/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "MARKVER/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MARKVER/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MARKVER/PIT.REQ",
+      "size": 4,
+      "sha256": "FBE555E70C558F724C26D8B3E50A9A9E55F6C5736C9CC45EA9E0A9CB3024387C"
+    },
+    {
+      "path": "MISMATCH/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MISMATCH/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MISMATCH/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "MISMATCH/MOVIE.WZP",
+      "size": 40,
+      "sha256": "F2EEB1DE516B29D393B87E51D5BCE767FF683C2DB31FEB3259C708C6686CF289"
+    },
+    {
+      "path": "MISMATCH/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MISMATCH/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "MIXED/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MIXED/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MIXED/MOVIE.WZM",
+      "size": 62,
+      "sha256": "107AC4788A1CA65B5BD19881D7593696AB0E98331CF5A4DC96757403B1F127C5"
+    },
+    {
+      "path": "MIXED/MOVIE.WZP",
+      "size": 40,
+      "sha256": "0D9AEF1092D64E343801FF3503B41FD7794FAB4609680CE007BF350536A1E201"
+    },
+    {
+      "path": "MIXED/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MIXED/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "MIXED/SCORE.MML",
+      "size": 101,
+      "sha256": "E6AAC78D41BA6EDDB86460AC7A0ADD621C28259A856CCE017FB5099B2517871E"
+    },
+    {
+      "path": "MULTIPLE/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MULTIPLE/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MULTIPLE/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "MULTIPLE/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MULTIPLE/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MULTIPLE/OTHER.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MULTIPLE/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "MUSIC1/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MUSIC1/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MUSIC1/MOVIE.WZM",
+      "size": 48,
+      "sha256": "7ED441785364DEFAA58B63A55E5622A402034A5499649B39EBEE2EE584758ECF"
+    },
+    {
+      "path": "MUSIC1/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MUSIC1/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MUSIC1/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "MUSICEND/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MUSICEND/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MUSICEND/MOVIE.WZM",
+      "size": 48,
+      "sha256": "B3038C27487F14023C6ABD44B69277C0088D600AE8245D0728BC9803592DD027"
+    },
+    {
+      "path": "MUSICEND/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MUSICEND/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MUSICEND/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "MUSICNOT/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MUSICNOT/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MUSICNOT/MOVIE.WZM",
+      "size": 48,
+      "sha256": "F461305D244D0A16ADDC9B96F883BA568EE8900A01305CBB6ECD976BB86CB4FD"
+    },
+    {
+      "path": "MUSICNOT/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MUSICNOT/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MUSICNOT/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "MUSICRSV/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MUSICRSV/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MUSICRSV/MOVIE.WZM",
+      "size": 48,
+      "sha256": "C33A2793AD83C4D819B9D46EB30D0405AF5CDA10C3F18EE10EB830622B236E18"
+    },
+    {
+      "path": "MUSICRSV/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MUSICRSV/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MUSICRSV/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "MUSICVEL/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "MUSICVEL/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "MUSICVEL/MOVIE.WZM",
+      "size": 48,
+      "sha256": "00A11A80158FA42E3700BBBA6C1184C9B03A8E12A199EF3AABB5D74498BD45E4"
+    },
+    {
+      "path": "MUSICVEL/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "MUSICVEL/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "MUSICVEL/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "NOFINAL/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "NOFINAL/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "NOFINAL/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "NOFINAL/MOVIE.WZP",
+      "size": 40,
+      "sha256": "5BBC22F1A9ABC7FC80B294E9C8EC199F428E42CF21D1898A30A9FB06372F3474"
+    },
+    {
+      "path": "NOFINAL/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "NOFINAL/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "NOMARK/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "NOMARK/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "NOMARK/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "NOMARK/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "NOMARK/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "NOPART/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "NOPART/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "NOPART/MOVIE.WZM",
+      "size": 62,
+      "sha256": "1A1073AD225EF7C597D71428B32E5B3B107F386E89C9CD9D2E04314FD5BFC06B"
+    },
+    {
+      "path": "NOPART/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "C6BADB6883D1A76195738F1A718C982D3AA3E0BE16D8FF84A010EA7226DBA832"
+    },
+    {
+      "path": "NOPART/SCORE.MML",
+      "size": 27,
+      "sha256": "0023E33BDE96FB022FC846BBFD33AAD1925846598A28EFF769F1E3C244261192"
+    },
+    {
+      "path": "NOWZM/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "NOWZM/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "NOWZM/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "NOWZM/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "NOWZM/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "NOWZP/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "NOWZP/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "NOWZP/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "NOWZP/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "NOWZP/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "OFFFLAG/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "OFFFLAG/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "OFFFLAG/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "OFFFLAG/MOVIE.WZP",
+      "size": 40,
+      "sha256": "1CB500EBFCE9B8A05B993ADCA463EE96A9DD2D07B4E5CBDD3D9C1E6CC048C600"
+    },
+    {
+      "path": "OFFFLAG/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "OFFFLAG/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "PASTEND/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "PASTEND/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "PASTEND/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "PASTEND/MOVIE.WZP",
+      "size": 40,
+      "sha256": "2A458AA2DB37970B909372305DB39C1DF2FAAC82BF412449CDCDADC76D7CCF00"
+    },
+    {
+      "path": "PASTEND/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "PASTEND/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "PITCH.json",
+      "size": 3388,
+      "sha256": "4B32DD07C803C4968D2E433E0E36F20DBA563F1DBA2F121BB2C5CE20BC8B3B29"
+    },
+    {
+      "path": "PITCH44/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "PITCH44/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "PITCH44/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "PITCH44/MOVIE.WZP",
+      "size": 40,
+      "sha256": "CCE8265ED88353A15ED4628AE03382D04B9FC773487D26CEF51C8575DF5FE31C"
+    },
+    {
+      "path": "PITCH44/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "PITCH44/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "PITCH97/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "PITCH97/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "PITCH97/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "PITCH97/MOVIE.WZP",
+      "size": 40,
+      "sha256": "A8190266F7B3DB882C950B85890B305C8FA2FCF841815A2D7E5279BBD2FEACB9"
+    },
+    {
+      "path": "PITCH97/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "PITCH97/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "REPEAT/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "REPEAT/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "REPEAT/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "REPEAT/MOVIE.WZP",
+      "size": 40,
+      "sha256": "A6C416397ED71BF3CAA5394B4A514C5B93937B336A7FCB3ACA816985DAE60124"
+    },
+    {
+      "path": "REPEAT/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "REPEAT/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "REPEAT/SCORE.MML",
+      "size": 24,
+      "sha256": "6176C3C3FC34318B6FBCD712D9FE0A7F24568CAB5AEE07A1D46C6E2C2D47B564"
+    },
+    {
+      "path": "REQUNK/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "REQUNK/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "REQUNK/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "REQUNK/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "REQUNK/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "REQUNK/OTHER.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "REQUNK/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "REST/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "REST/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "REST/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "REST/MOVIE.WZP",
+      "size": 40,
+      "sha256": "F4F685CFAF56B81C60BF0F85AD934A2860AD86016E5769A4D5FDD14FE631BA85"
+    },
+    {
+      "path": "REST/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "REST/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "REST/SCORE.MML",
+      "size": 24,
+      "sha256": "CE6C5356F41F3B2186F6349230DC6AEA1408FCFB2BC30BBCF7FE8BBE3FAA2581"
+    },
+    {
+      "path": "RFLAGS/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "RFLAGS/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "RFLAGS/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "RFLAGS/MOVIE.WZP",
+      "size": 40,
+      "sha256": "90A7987C7A09CCD96B355D0035780EFACDFB4689B23A8DA060F434E28C0418E5"
+    },
+    {
+      "path": "RFLAGS/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "RFLAGS/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "RHDR/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "RHDR/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "RHDR/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "RHDR/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D7CAE9F5AF686593AA1907A56824FF2AD066347F0734C36A0C86938757B0F541"
+    },
+    {
+      "path": "RHDR/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "RHDR/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "RREC/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "RREC/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "RREC/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "RREC/MOVIE.WZP",
+      "size": 40,
+      "sha256": "CE627FBF3EB4C92C20FE87104ED0469701B06F214E28722B3FFD24ED13E37E25"
+    },
+    {
+      "path": "RREC/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "RREC/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "TRAIL/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "TRAIL/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "TRAIL/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "TRAIL/MOVIE.WZP",
+      "size": 41,
+      "sha256": "C19A26E8C7176EFFBEEADFA00E32819A2259A1099ECC6A041BB4E29E6E3AAB3D"
+    },
+    {
+      "path": "TRAIL/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "TRAIL/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "TRUNC/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "TRUNC/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "TRUNC/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "TRUNC/MOVIE.WZP",
+      "size": 39,
+      "sha256": "E6B5DB28E9C5ACC25C4810806A7ACA81ADA3B1DD8D1330BF7E19AB181457D081"
+    },
+    {
+      "path": "TRUNC/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "TRUNC/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "UNKNOWN/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "UNKNOWN/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "UNKNOWN/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "UNKNOWN/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "UNKNOWN/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "UNKNOWN/MOVIE.WZX",
+      "size": 1,
+      "sha256": "4BF5122F344554C53BDE2EBB8CD2B7E3D1600AD631C385A5D7CCE23C7785459A"
+    },
+    {
+      "path": "UNKNOWN/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "UNSORTED/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "UNSORTED/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "UNSORTED/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "UNSORTED/MOVIE.WZP",
+      "size": 48,
+      "sha256": "C4986C34D31BE069F07C2B8488088DC9A35A4451819CCD040E4D2E12D3D83140"
+    },
+    {
+      "path": "UNSORTED/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "UNSORTED/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "VERSION/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "VERSION/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "VERSION/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "VERSION/MOVIE.WZP",
+      "size": 40,
+      "sha256": "83E7376BD956DCE903EA20ABF627C566044DCD283EB6FBE631720C69D49EAA9A"
+    },
+    {
+      "path": "VERSION/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "VERSION/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "VIDEO2/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "VIDEO2/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "VIDEO2/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "VIDEO2/MOVIE.WZP",
+      "size": 40,
+      "sha256": "D5C5A575D1CA7F1FBFA881F1F3FAFA3A2E8C8DECC3255B3E10E06CE790014480"
+    },
+    {
+      "path": "VIDEO2/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "C6BADB6883D1A76195738F1A718C982D3AA3E0BE16D8FF84A010EA7226DBA832"
+    },
+    {
+      "path": "VIDEO2/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "VZERO/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "VZERO/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "VZERO/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "VZERO/MOVIE.WZP",
+      "size": 40,
+      "sha256": "F4F685CFAF56B81C60BF0F85AD934A2860AD86016E5769A4D5FDD14FE631BA85"
+    },
+    {
+      "path": "VZERO/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "VZERO/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    },
+    {
+      "path": "VZERO/SCORE.MML",
+      "size": 30,
+      "sha256": "A10A0210953984D614571A6D40A6240C32C49DE29ABCF285B796F4A490A3DAE0"
+    },
+    {
+      "path": "ZERODUR/INST.REQ",
+      "size": 4,
+      "sha256": "99F68DBFD8D832A1E3C1063CF4A3BFAFD46E3355A434615AC5F130A8BB8F86BA"
+    },
+    {
+      "path": "ZERODUR/MOVIE.WZI",
+      "size": 28,
+      "sha256": "9FE82FCAE36ADAADFAD3A790FBB06A4228CFDF428BC941B25DB79AF0D456B070"
+    },
+    {
+      "path": "ZERODUR/MOVIE.WZM",
+      "size": 48,
+      "sha256": "351F35E89C856C3E40D77A80A692811C095BF565C879C3C00CF4381104DC4041"
+    },
+    {
+      "path": "ZERODUR/MOVIE.WZP",
+      "size": 40,
+      "sha256": "3D3A989D55178C4543DD5262C48F4303F9AE1741FA8F9064D09167BA8901AACD"
+    },
+    {
+      "path": "ZERODUR/MOVIE.WZV",
+      "size": 81944,
+      "sha256": "9E701063AB54F7F3AE0BBFDFEFAF13EC92BCF3641A8BB8B3901BAF06818A97CB"
+    },
+    {
+      "path": "ZERODUR/PIT.REQ",
+      "size": 4,
+      "sha256": "EC7AC0648DFD777CBF138EA40D40F5B10A500E650E3DC5556C71715BCB7A10A8"
+    }
+  ]
+}

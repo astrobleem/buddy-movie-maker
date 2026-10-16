@@ -7,3 +7,6 @@ tools/BuddyMovieMaker/Runtime/*.BAT text eol=crlf
 # Authoritative fixtures and third-party notices retain their original bytes.
 tools/BuddyMovieMaker/Tests/Mml2Contract/* -text
 notices/* -text
+# Frozen cross-player contract bytes include checksummed text files.
+tools/BuddyMoviePlayer/Tests/PitContract/MML3.md -text
+tools/BuddyMoviePlayer/Tests/PitContract/v1/** -text

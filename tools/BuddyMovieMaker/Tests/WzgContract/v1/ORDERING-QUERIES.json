@@ -1,0 +1,418 @@
+[
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": false,
+    "time_ms": 0,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 249,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 250,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 499,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 500,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 501,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 504,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 505,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 506,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 749,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 750,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": false,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 999,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "gain_bypasses_envelope_quantum_cache": true,
+    "terminal": true,
+    "attack_presets": [
+      5,
+      3,
+      5,
+      10
+    ],
+    "extra_added_once_to_InstRead": true,
+    "attack_velocities": [
+      100,
+      90,
+      80,
+      100
+    ],
+    "hat_envelope_expired": true,
+    "time_ms": 1000,
+    "flushes_at_timestamp": 1,
+    "attack_ms": [
+      500,
+      0,
+      0,
+      0
+    ],
+    "extra_steps": [
+      15,
+      15,
+      15,
+      15
+    ]
+  }
+]

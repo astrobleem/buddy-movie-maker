@@ -60,10 +60,14 @@ Source media and existing exports are never edited or overwritten.
   but Maker emits this one profile only.
 - MIDI format 0/1, PPQN, 1–64 tracks, ≤4 MiB, ≤100,000 parsed relevant events,
   ≤10,000 exported states. Melodic notes must be 45–96. Three melodic PSG voices;
-  highest velocity wins excess polyphony, with channel/note tie order. Sustain
-  and all-notes-off are supported. Channel 10 percussion, programs, pitch bend,
-  expression and other controllers are omitted. Repeated overlapping same-note
-  MIDI voices collapse to one note. No MIDI synthesis in the Windows preview.
+  highest velocity wins excess polyphony, with channel/note/track tie order.
+  Sustain and channel all-notes-off are supported. GM channel 10 keys35..81 use
+  one fixed-noise lane; unknown drum keys refuse before export. Noise collisions
+  and GM timbre reductions are reported in MIDI-REPORT.JSON; losing hits are
+  never queued or replayed later. Programs, pitch bend, expression and other
+  ignored messages are counted. Same-note overlap within one track/channel
+  collapses to one note; different tracks keep separate note ownership.
+  No MIDI synthesis in the Windows preview. See [MIDI-DRUMS.md](MIDI-DRUMS.md).
 - MIDI timeline (including end-of-track) must fit video, with 250 ms tolerance
   for rounding. It starts at movie time zero. A shorter score becomes silent
   after its note-offs; cleanup always mutes PSG at movie end. All exported WZM
@@ -103,8 +107,11 @@ MML1 accepts three parts `[A]`, `[B]`, `[C]`, notes/rests, tempo/octave/length/
 volume, bounded repeats and eight original WININST12 presets. Choose an initial
 preset and optional eligible-preset vibrato; explicit `@` commands override it.
 See [MML1.md](MML1.md) for exact syntax, timing, limits and shared conformance.
-MIDI keeps the established plain PSG mapping; MML uses the original WININST12
-55 ms envelope engine. A later preset command does not change a held note.
+Tone-only MIDI keeps the established plain PSG mapping. MIDI with drums uses
+constant Organ tones plus original WININST12 noise envelopes and the qualified
+sound-owned player. MML uses the original WININST12 55 ms envelope engine.
+A later preset command does not change a held note. Cue-scoped held-note fades
+are modeled separately and are not exported until consumers agree a gain stream.
 
 Add local WAV/MP3/FLAC/OGG/M4A/AAC clips and edit their start times in milliseconds.
 Maximum 16 clips, 8 seconds each, 60 seconds total, 64 MiB per source file.
@@ -132,7 +139,7 @@ The existing WZM1/WZI1 formats and INST.REQ marker are unchanged. The new
 MOVPLAY supports their fourth-slot noise with the original WININST12 curves.
 Older Maker parsers reject MML2 text and older expressive players reject these
 noise records; keep the newly exported player in every updated movie folder.
-MML1 songs remain byte-compatible. MIDI percussion remains omitted. Logical
+MML1 songs remain byte-compatible. MIDI percussion uses the same map. Logical
 noise must rest throughout the same150ms speech guards even after its envelope
 has self-expired. The Windows preview remains silent.
 
