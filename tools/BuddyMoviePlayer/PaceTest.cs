@@ -9,9 +9,10 @@ static class PaceTest
   Directory.CreateDirectory(output);var events=new List<string>();
   try {
    string moviePath=input;
-   if(input=="synthetic") {string folder=Path.Combine(output,"synthetic-72-seconds");CreateFixture(folder);moviePath=Path.Combine(folder,"MOVIE.WZV");}
-   using var movie=new Movie(moviePath);int duration=movie.Duration;
-   using var player=new Player();player.Show();Application.DoEvents();var loading=Stopwatch.StartNew();var open=player.OpenAsync(moviePath,false);while(!open.IsCompleted){Application.DoEvents();Thread.Sleep(5);}open.GetAwaiter().GetResult();loading.Stop();
+   bool pit=input=="synthetic-pit";
+   if(input is "synthetic" or "synthetic-pit") {string folder=Path.Combine(output,"synthetic-72-seconds");CreateFixture(folder,pit);moviePath=Path.Combine(folder,"MOVIE.WZV");}
+   using var movie=new Movie(moviePath,pit);int duration=movie.Duration;
+   using var player=new Player(){PitEnabled=pit};player.Show();Application.DoEvents();var loading=Stopwatch.StartNew();var open=player.OpenAsync(moviePath,false);while(!open.IsCompleted){Application.DoEvents();Thread.Sleep(5);}open.GetAwaiter().GetResult();loading.Stop();
    events.Add($"duration_ms={duration}; sample_rate={Synth.Rate}; samples={duration*(Synth.Rate/1000)}; bytes={duration*(Synth.Rate/1000)*2}; format=mono PCM16; render_and_open_wall_ms={loading.ElapsedMilliseconds}");
    if(duration<30500)throw new InvalidDataException("Timing qualification needs a movie at least 30.5 seconds long.");
    player.Toggle();var main=Measure(player,Math.Min(60000,duration-500),Path.Combine(output,"main.csv"));
@@ -37,10 +38,12 @@ static class PaceTest
   Application.DoEvents();player.TickPlayback();var final=player.AudioClock;rawLast=final.Value;type=final.Type;return new(wall.ElapsedMilliseconds,player.Position-first,(player.Position-first)/(double)wall.ElapsedMilliseconds,monotonic,maxDrift,type,(long)rawLast-rawFirst.Value);
  }
  static void Pump(Player player,int ms){var watch=Stopwatch.StartNew();while(watch.ElapsedMilliseconds<ms){Application.DoEvents();player.TickPlayback();Thread.Sleep(5);}}
- static void CreateFixture(string folder)
+ internal static void CreateFixture(string folder,bool pit=false)
  {
   Directory.CreateDirectory(folder);const int duration=72000,width=256,height=160,frames=288;
   using(var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZV")))){w.Write(Encoding.ASCII.GetBytes("WZV2"));w.Write((ushort)width);w.Write((ushort)height);w.Write((ushort)4);w.Write((ushort)24);w.Write(frames);w.Write(duration);w.Write(width*height/2);for(int f=0;f<frames;f++)for(int i=0;i<width*height/2;i++)w.Write((byte)(((f%16)<<4)|(i%16)));}
   using(var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZM")))){w.Write(Encoding.ASCII.GetBytes("WZM1"));w.Write((ushort)20);w.Write((ushort)14);w.Write(2);w.Write(duration);w.Write(0);w.Write(0);w.Write(new byte[]{60,64,67,38});w.Write(new byte[]{88,88,88,64});w.Write((byte)15);w.Write((byte)0);w.Write(duration);w.Write(new byte[10]);}
+  if(pit){foreach(var item in new[]{("MOVIE.WZV","WZV3"),("MOVIE.WZM","WZM2")}){using var f=new FileStream(Path.Combine(folder,item.Item1),FileMode.Open,FileAccess.Write);f.Write(Encoding.ASCII.GetBytes(item.Item2));}
+   File.WriteAllText(Path.Combine(folder,"PIT.REQ"),"WZP1");using var w=new BinaryWriter(File.Create(Path.Combine(folder,"MOVIE.WZP")));w.Write(Encoding.ASCII.GetBytes("WZP1"));w.Write((ushort)1);w.Write((ushort)0);w.Write(duration);w.Write((ushort)4);w.Write((ushort)0);foreach(var p in new[]{new PitNote(0,69,true),new PitNote(30000,69,true),new PitNote(45000,76,false),new PitNote(duration,0,false)}){w.Write(p.Time);w.Write(p.Note);w.Write((byte)(p.Attack?1:0));w.Write((ushort)0);}}
  }
 }

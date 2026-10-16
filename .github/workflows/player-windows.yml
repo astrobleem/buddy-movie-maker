@@ -36,3 +36,12 @@ jobs:
           $test = Start-Process $player -ArgumentList @('--self-test-headless', $evidence) -Wait -PassThru
           Get-Content (Join-Path $evidence 'test-results.txt')
           if ($test.ExitCode -ne 0) { throw 'Player tests failed' }
+      - name: Verify frozen PIT contract without an audio device
+        shell: pwsh
+        run: |
+          $player = Join-Path $PWD 'out/BuddyMoviePlayer.exe'
+          $corpus = Join-Path $PWD 'tools/BuddyMoviePlayer/Tests/PitContract/v1'
+          $evidence = Join-Path $PWD 'pit-test-output'
+          $test = Start-Process $player -ArgumentList @('--pit-contract-test-headless', $corpus, $evidence) -Wait -PassThru
+          Get-Content (Join-Path $evidence 'pit-results.txt')
+          if ($test.ExitCode -ne 0) { throw 'PIT contract tests failed' }
