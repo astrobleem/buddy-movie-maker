@@ -16,7 +16,7 @@ try {
 }finally{foreach($name in $names){[Environment]::SetEnvironmentVariable($name,$previous[$name],'Process')}}
 $packages=if($env:NUGET_PACKAGES){$env:NUGET_PACKAGES}else{Join-Path $env:USERPROFILE '.nuget\packages'}
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\..\LICENSE') -Destination (Join-Path $target 'LICENSE.txt')
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'README.md') -Destination $target
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'README.md'),(Join-Path $PSScriptRoot 'TIMING.md') -Destination $target
 Copy-Item -LiteralPath (Join-Path $packages 'microsoft.netcore.app.runtime.win-x64\8.0.32\LICENSE.TXT') -Destination (Join-Path $target 'DOTNET-LICENSE.txt')
 Copy-Item -LiteralPath (Join-Path $packages 'microsoft.netcore.app.runtime.win-x64\8.0.32\THIRD-PARTY-NOTICES.TXT') -Destination (Join-Path $target 'DOTNET-THIRD-PARTY-NOTICES.txt')
 Copy-Item -LiteralPath (Join-Path $packages 'microsoft.windowsdesktop.app.runtime.win-x64\8.0.32\LICENSE') -Destination (Join-Path $target 'WINDOWSDESKTOP-LICENSE.txt')
