@@ -7,6 +7,9 @@ local Windows x64 FFmpeg distribution containing `ffmpeg.exe` and `ffprobe.exe`.
 Run `BuddyMovieMaker.exe` from the extracted folder; keep `runtime/` and
 `runtime-mml3/` beside it.
 
+New source builds pin .NET 8.0.32; the earlier released package described above
+retains its original 8.0.31 runtime. See [dependency details](DEPENDENCIES.md).
+
 ## Make a movie
 
 1. Click **Choose existing FFmpeg** and select `ffmpeg.exe`. The app checks both

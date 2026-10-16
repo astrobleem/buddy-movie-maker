@@ -45,7 +45,7 @@ and instrument semantics; physical Tandy sound fidelity is not certified.
 
 ## Build and test
 
-Prerequisites: Windows x64, PowerShell, .NET SDK 8.0.425 (tested), DOSBox-X, and a
+Prerequisites: Windows x64, PowerShell, .NET SDK 8.0.426 (CI pin), DOSBox-X, and a
 separately supplied, appropriately licensed Microsoft C 6/MASM/DDK linker toolchain.
 The toolchain root must contain `BIN/CL.EXE`, `BIN/MASM.EXE`, `INCLUDE/`, `LIB/`,
 and `DDK/286/TOOLS/LINK4.EXE` (5.01.17 tested). These proprietary tools are not
@@ -70,6 +70,9 @@ commands are in the full guide. Emulator tests do not certify physical hardware,
 perceived audio quality, or a calibrated 4.77 MHz 8088.
 
 ## License and origin
+
+See [playback timing and ownership](tools/BuddyMoviePlayer/TIMING.md) for the
+separate x64 PCM, DOS, and upstream Win16 paths and Windows MIDI integration needs.
 
 Source is provided under [GNU GPL version 3](LICENSE), preserving the upstream
 project license. It was extracted from

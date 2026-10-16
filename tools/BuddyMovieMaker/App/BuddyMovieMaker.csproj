@@ -3,6 +3,6 @@
     <OutputType>WinExe</OutputType><TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
     <AssemblyName>BuddyMovieMaker</AssemblyName>
-    <RuntimeFrameworkVersion>8.0.31</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>8.0.32</RuntimeFrameworkVersion>
   </PropertyGroup>
 </Project>

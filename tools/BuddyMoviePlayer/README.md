@@ -5,6 +5,10 @@ Native Windows 10/11 x64 desktop player for Buddy movies. The downloadable
 installation, FFmpeg, DOS emulator, or Tandy driver. This is the modern x64
 companion to the existing **16-bit Windows 3.0** player.
 
+New source builds pin .NET 8.0.32. Earlier download/qualification statements
+describe their original 8.0.31 packages; this change does not replace a release.
+See [timing and ownership](TIMING.md) for the playback clock and backend boundaries.
+
 Open a `.WZV` movie or `.WZM` audio score, keep its sidecars together, and press Play. Open accepts any
 basename (e.g. `MOVIE.WZV` or `WEEZER.WZV`). Space toggles play/pause, Left/Right
 seek five seconds, F11 toggles fullscreen, and Escape exits fullscreen. Replay
