@@ -191,10 +191,14 @@ sparse 16 fps frames and 16/16 dense 4 fps frames; the opening image precedes
 the clock (63 timed sparse updates in 4.009 seconds). This is an opt-in
 experiment, not physical-hardware qualification. The sequential delta stream
 falls behind dense 8/16 fps input: measured pre-draw lateness reached 1.4/2.6
-seconds. A short matched dense 8 fps trial showed 21/32 WZD1 frames versus
-22/32 WZF1 frames, with final source frame 20 versus 29; WZF1 still omitted
-10 frames. Sparse playback remained 64/64. The fixture uses emulated RAM-speed
-XTIDE storage, not a physical disk. BIOS ticks resolve about 55 ms.
+seconds. A later matched dense 8 fps WZF1 trial showed 23/32 frames with
+two 4 KB reads per frame versus 24/32 with one 8 KB read (5.41 versus 5.74
+timed updates/second); 8 frames were still omitted. A read-only 256 KB
+comparison took 54 versus 47 BIOS ticks. Full frames now use one 8 KB DOS
+read into the existing buffer, with controls checked after that read and every
+512 attribute writes. Sparse reads remain 4 KB and playback remained 64/64.
+The fixture uses emulated RAM-speed XTIDE storage, not a physical disk. BIOS
+ticks resolve about 55 ms.
 No 30 fps or general dense-video rate is promised. `Cga/encode.py`
 also generates original short fixtures without third-party media.
 

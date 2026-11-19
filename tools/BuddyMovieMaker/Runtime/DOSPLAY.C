@@ -480,9 +480,9 @@ static int fullService(U32 now)
         if(lseek(df,(long)offset,0)!=(long)offset)return fail(85);
         fullCursor=offset;
     }
-    for(done=0;done<8192;done+=4096){
-        if(!readExact(df,pixels+done,4096))return fail(85);
-        fullCursor+=4096UL;videoBytes+=4096;
+    for(done=0;done<8192;done+=8192){
+        if(!readExact(df,pixels+done,8192))return fail(85);
+        fullCursor+=8192UL;videoBytes+=8192;
         if(!controls())return 1;
         if(!openingFrame&&elapsed()>=playEnd){
             spent=since(t,ClockTick());readTicks+=spent;
@@ -615,7 +615,7 @@ static void report(char *reason)
     fprintf(f,"cga100=%d\npreencoded=%d\nlast_frame=%lu\nvideo_bytes_read=%lu\n",cga100,preencoded,lastFrame,videoBytes);
     fprintf(f,"delta_spans=%lu\ndelta_vram_bytes=%lu\nvideo_late_frames=%lu\nvideo_max_late_ms=%lu\nsnapshot_error=%u\n",deltaSpans,deltaBytes,videoLate,maxVideoLate,snapshotError);
     fprintf(f,"read_total_ticks=%lu\nparse_total_ticks=%lu\ndraw_total_ticks=%lu\ndelta_copy_max_attributes=512\n",readTicks,parseTicks,drawTicks);
-    fprintf(f,"video_read_chunk_bytes=4096\ndraw_batch_rows=16\n");
+    fprintf(f,"video_read_chunk_bytes=%u\ndraw_batch_rows=16\n",fullFrames?8192:4096);
     fprintf(f,"video_read_max_ticks=%lu\nmusic_read_max_ticks=%lu\ndraw_max_ticks=%lu\n",maxVideoRead,maxMusicRead,maxDraw);
     fprintf(f,"play_start_ms=%lu\nplay_end_ms=%lu\nrun_elapsed_ms=%lu\nprerolled_records=%lu\nfull_range=%d\n",playStart,playEnd,elapsedEnd>=playStart?elapsedEnd-playStart:0UL,prerolled,fullRange);
     fprintf(f,"sound_mask_after_stop=%u\npsg_writes=%lu\nold_mode=%u\nrestored_mode=%u\n",mask,psgWrites,oldMode,VideoMode());
