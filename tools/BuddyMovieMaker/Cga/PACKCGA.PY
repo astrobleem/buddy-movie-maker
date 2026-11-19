@@ -3,7 +3,7 @@ Python 3 on a development host. GPL-3.0, matching the DOS runtime.
 """
 from pathlib import Path
 import argparse,struct
-from encode import spans
+from encode import spans,full_frame_if_larger
 p=argparse.ArgumentParser();p.add_argument('movie',type=Path);p.add_argument('out',type=Path);a=p.parse_args()
 with a.movie.open('rb') as f:
  h=f.read(24)
@@ -29,4 +29,5 @@ with a.movie.open('rb') as f:
       frame[y*80+x//2]=(hi<<4)|lo
    v.write(frame);packet=spans(frame,previous);d.write(struct.pack('<I',len(packet)));d.write(packet);previous=frame
  (a.out/'MOVIE.CUE').write_bytes(struct.pack('<4sIII',b'WZC1',ms,0,ms))
+full_frame_if_larger(a.out)
 print('Created video-only CGA export:',a.out,'frames:',n,'fps:',fps)

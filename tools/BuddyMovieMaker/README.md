@@ -167,7 +167,10 @@ undo a completed export. Closing while busy requests cancellation first.
 The ordinary Tandy mode-9 commands and hardware check remain unchanged. The
 optional `/C` path uses actual 160x100 RGBI CGA text semigraphics and requires
 video-only `/V`; music/captions are unavailable and speech is rejected. `/P`
-adds the independently encoded `MOVIE.WZD` attribute-span stream. Build the
+adds the independently encoded `MOVIE.WZD` sidecar. Sparse clips use WZD1
+attribute spans; dense clips use independent WZF1 full frames, aligned to
+4096-byte reads. Overloaded WZF1 playback follows the source clock and reports
+skipped frames; WZD1 must process dependent frames in sequence. Build the
 runtime with its existing MSC6/MASM `Runtime/BUILD.BAT` (including `CGA100.ASM`).
 The existing `Build.ps1` already copies all runtime assembly sources.
 
@@ -188,7 +191,11 @@ sparse 16 fps frames and 16/16 dense 4 fps frames; the opening image precedes
 the clock (63 timed sparse updates in 4.009 seconds). This is an opt-in
 experiment, not physical-hardware qualification. The sequential delta stream
 falls behind dense 8/16 fps input: measured pre-draw lateness reached 1.4/2.6
-seconds. No 30 fps or general dense-video rate is promised. `Cga/encode.py`
+seconds. A short matched dense 8 fps trial showed 21/32 WZD1 frames versus
+22/32 WZF1 frames, with final source frame 20 versus 29; WZF1 still omitted
+10 frames. Sparse playback remained 64/64. The fixture uses emulated RAM-speed
+XTIDE storage, not a physical disk. BIOS ticks resolve about 55 ms.
+No 30 fps or general dense-video rate is promised. `Cga/encode.py`
 also generates original short fixtures without third-party media.
 
 ## Developer build and tests

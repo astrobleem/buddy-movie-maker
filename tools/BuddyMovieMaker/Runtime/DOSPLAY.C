@@ -27,7 +27,8 @@ extern unsigned _cdecl IsWindows(void);
 extern void _cdecl Cga100(void);
 extern void _cdecl CgaRow(U8 *,unsigned,unsigned);
 extern void _cdecl CgaBatch(U8 *,unsigned,unsigned);
-static int cga100,preencoded,snapshot,df=-1;
+static int cga100,preencoded,snapshot,df=-1,fullFrames;
+static U32 fullCursor,maxPresentLate;
 static U32 deltaNext,videoLate,maxVideoLate,deltaBytes,deltaSpans,videoBytes;
 static U32 readTicks,drawTicks,parseTicks;
 static unsigned snapshotError;
@@ -447,10 +448,16 @@ static int openDelta(void)
 {
     U8 h[24];if(!preencoded)return 1;
     if(!cga100||_dos_open("MOVIE.WZD",O_RDONLY,&df))return fail(80);
-    if(!readExact(df,h,24)||memcmp(h,"WZD1",4)||wordAt(h+4)!=160||
-       wordAt(h+6)!=100||wordAt(h+8)!=fps||wordAt(h+10)!=24||
-       longAt(h+12)!=frames||longAt(h+16)!=duration||longAt(h+20)!=32000UL)
-        return fail(82);
+    if(!readExact(df,h,24)||
+       (memcmp(h,"WZD1",4)&&memcmp(h,"WZF1",4))||wordAt(h+4)!=160||
+       wordAt(h+6)!=100||wordAt(h+8)!=fps||
+       longAt(h+12)!=frames||longAt(h+16)!=duration)return fail(82);
+    fullFrames=!memcmp(h,"WZF1",4);
+    if(fullFrames){
+        if(wordAt(h+10)!=4096||longAt(h+20)!=8192UL)return fail(82);
+        fullCursor=(U32)lseek(df,0L,2);
+        if(fullCursor!=4096UL+frames*8192UL)return fail(82);
+    }else if(wordAt(h+10)!=24||longAt(h+20)!=32000UL)return fail(82);
     return 1;
 }
 static int controls(void)
@@ -458,9 +465,49 @@ static int controls(void)
     unsigned k=KeyRead();if(k==3||k==27||k==32)interrupted=1;
     return interrupted==0;
 }
+/* Dense frames are independent and aligned for DOS sector/cluster reads.
+ * Follow the existing video clock, counting skipped source frames explicitly. */
+static int fullService(U32 now)
+{
+    U32 frame,t,spent,offset,late;unsigned done,chunk;
+    frame=now*fps/1000UL;if(frame>=frames)frame=frames-1;
+    if(frame==lastFrame)return 1;
+    late=now-frame*1000UL/fps;
+    if(late){videoLate++;if(late>maxVideoLate)maxVideoLate=late;}
+    if(lastFrame!=0xffffffffUL&&frame>lastFrame+1)dropped+=frame-lastFrame-1;
+    offset=4096UL+frame*8192UL;t=ClockTick();
+    if(fullCursor!=offset){
+        if(lseek(df,(long)offset,0)!=(long)offset)return fail(85);
+        fullCursor=offset;
+    }
+    for(done=0;done<8192;done+=4096){
+        if(!readExact(df,pixels+done,4096))return fail(85);
+        fullCursor+=4096UL;videoBytes+=4096;
+        if(!controls())return 1;
+        if(!openingFrame&&elapsed()>=playEnd){
+            spent=since(t,ClockTick());readTicks+=spent;
+            if(spent>maxVideoRead)maxVideoRead=spent;return 1;
+        }
+    }
+    spent=since(t,ClockTick());readTicks+=spent;
+    if(spent>maxVideoRead)maxVideoRead=spent;t=ClockTick();
+    for(done=0;done<8000;done+=chunk){
+        chunk=8000-done;if(chunk>512)chunk=512;
+        CgaBatch(pixels+done,done*2+1,chunk);
+        if(!controls())return 1;
+    }
+    spent=since(t,ClockTick());drawTicks+=spent;
+    if(spent>maxDraw)maxDraw=spent;
+    if(!openingFrame){
+        late=elapsed()-frame*1000UL/fps;
+        if(late>maxPresentLate)maxPresentLate=late;
+    }
+    deltaSpans++;deltaBytes+=8000UL;lastFrame=frame;rendered++;return 1;
+}
 static int deltaService(U32 now)
 {
     U8 h[4];U32 len,t,late,spent;unsigned n,pos,off,count,end=0,done,chunk,tail;
+    if(fullFrames)return fullService(now);
     if(deltaNext>=frames||now<deltaNext*1000UL/fps)return 1;
     late=now-deltaNext*1000UL/fps;
     if(late){videoLate++;if(late>maxVideoLate)maxVideoLate=late;}
@@ -564,6 +611,7 @@ static void report(char *reason)
     fprintf(f,"width=%u\nheight=%u\nfps=%u\nduration_ms=%lu\nelapsed_ms=%lu\n",width,height,fps,duration,elapsedEnd);
     fprintf(f,"frames=%lu\ndropped_frames=%lu\nmusic_events_applied=%lu\nmusic_events_skipped=%lu\nmusic_events_read=%lu\n",rendered,dropped,applied,skipped,recordsRead);
     fprintf(f,"music_max_late_ms=%lu\nmusic_total_late_ms=%lu\nservice_max_gap_ms=%lu\n",maxLate,totalLate,maxGap);
+    fprintf(f,"bulk_full_frames=%d\nvideo_max_present_late_ms=%lu\n",fullFrames,maxPresentLate);
     fprintf(f,"cga100=%d\npreencoded=%d\nlast_frame=%lu\nvideo_bytes_read=%lu\n",cga100,preencoded,lastFrame,videoBytes);
     fprintf(f,"delta_spans=%lu\ndelta_vram_bytes=%lu\nvideo_late_frames=%lu\nvideo_max_late_ms=%lu\nsnapshot_error=%u\n",deltaSpans,deltaBytes,videoLate,maxVideoLate,snapshotError);
     fprintf(f,"read_total_ticks=%lu\nparse_total_ticks=%lu\ndraw_total_ticks=%lu\ndelta_copy_max_attributes=512\n",readTicks,parseTicks,drawTicks);
@@ -649,5 +697,5 @@ done:
     if(captionEnabled&&(mode&2)&&captionStatus<0)puts("Invalid subtitle file: captions disabled.");
     return error?1:0;
 usage:
-    puts("MOVPLAY [/F full video] [/L subtitles] [/A audio | /V video | /B both]\nExperimental /C: CGA100 video-only; /P: WZD1; /S: capture.\nNo options: full video with subtitles. Escape/Space: stop; relaunch to restart.");return 1;
+    puts("MOVPLAY [/F full video] [/L subtitles] [/A audio | /V video | /B both]\nExperimental /C: CGA100 video-only; /P: WZD1/WZF1; /S: capture.\nNo options: full video with subtitles. Escape/Space: stop; relaunch to restart.");return 1;
 }

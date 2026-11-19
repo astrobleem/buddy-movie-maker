@@ -16,6 +16,28 @@ def spans(frame,previous):
  if len(packet)>32000:raise ValueError('Packet exceeds runtime bound')
  return packet
 
+def full_frame_if_larger(folder):
+ """Use independent sector-aligned frames when deltas cost at least raw data.
+
+ WZF1: common 24-byte metadata, header size 4096, frame stride 8192;
+ each frame contains 8000 CGA attributes followed by ignored padding.
+ WZD1 remains byte-for-byte unchanged for smaller sparse streams.
+ """
+ raw=folder/'MOVIE.WZV';sidecar=folder/'MOVIE.WZD'
+ with raw.open('rb') as f:
+  magic,w,h,fps,hs,n,ms,size=struct.unpack('<4s4H3I',f.read(24))
+  if (w,h)!=(160,100) or sidecar.stat().st_size<24+n*8000:return False
+  temporary=folder/'MOVIE.TMP'
+  with temporary.open('wb') as d:
+   header=struct.pack('<4s4H3I',b'WZF1',160,100,fps,4096,n,ms,8192)
+   d.write(header.ljust(4096,b'\0'))
+   for k in range(n):
+    frame=f.read(8000)
+    if len(frame)!=8000:raise ValueError('Truncated full-frame input')
+    d.write(frame);d.write(bytes(192))
+  temporary.replace(sidecar)
+ return True
+
 def make(folder,w,h,fps,sparse=True,seconds=4):
  folder.mkdir();n=fps*seconds;ms=seconds*1000;rng=random.Random(20261119)
  bg=bytes(rng.randrange(256) for _ in range(w*h//2));previous=None
