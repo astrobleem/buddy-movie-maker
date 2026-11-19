@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <conio.h>
 #include "PERIODS.H"
 #include "CAPTION.H"
 #include "INSTR.H"
@@ -23,6 +24,13 @@ extern void _cdecl VideoRow(U8 *,unsigned,unsigned);
 extern void _cdecl PsgByte(unsigned);
 extern unsigned _cdecl KeyRead(void);
 extern unsigned _cdecl IsWindows(void);
+extern void _cdecl Cga100(void);
+extern void _cdecl CgaRow(U8 *,unsigned,unsigned);
+extern void _cdecl CgaBatch(U8 *,unsigned,unsigned);
+static int cga100,preencoded,snapshot,df=-1;
+static U32 deltaNext,videoLate,maxVideoLate,deltaBytes,deltaSpans,videoBytes;
+static U32 readTicks,drawTicks,parseTicks;
+static unsigned snapshotError;
 static int vf=-1,mf=-1,haveHardware,displayChanged,handlers,mode=2,error;
 static unsigned oldMode,width,height,fps,frameBytes,rowBytes,xByte,yTop;
 static U8 pixels[MAX_FRAME],musicBuffer[MUSIC_CHUNK*RECORD_SIZE];
@@ -106,6 +114,7 @@ static void cleanup(void)
     if(displayChanged){SetMode(oldMode);displayChanged=0;}
     if(vf>=0){_dos_close(vf);vf=-1;}
     if(mf>=0){_dos_close(mf);mf=-1;}
+    if(df>=0){_dos_close(df);df=-1;}
     if(inf>=0){_dos_close(inf);inf=-1;}
 }
 static void restoreHandlers(void)
@@ -119,15 +128,16 @@ static int openVideo(void)
     if(!readExact(vf,h,VIDEO_HEADER))return fail(11);
     width=wordAt(h+4);height=wordAt(h+6);fps=wordAt(h+8);
     if(memcmp(h,"WZV2",4)||wordAt(h+10)!=VIDEO_HEADER||
-       !(width>=4&&width<=320&&!(width&3)&&height>=1&&height<=200&&(fps==2||fps==4||fps==8)))return fail(12);
+       !(width>=4&&width<=320&&!(width&3)&&height>=1&&height<=200&&(fps==2||fps==4||fps==8||(cga100&&fps==16))))return fail(12);
     frames=longAt(h+12);duration=longAt(h+16);
     frameBytes=width*height/2;rowBytes=width/2;
     if(longAt(h+20)!=(U32)frameBytes)return fail(12);
     step=1000UL/fps;
-    if(!frames||frames>4800UL||!duration||duration>600000UL||
-       duration>frames*step||duration<=(frames-1)*step)return fail(13);
+    if(!frames||frames>(cga100?9600UL:4800UL)||!duration||duration>600000UL||
+       duration>frames*1000UL/fps||duration<=(frames-1)*1000UL/fps)return fail(13);
     expected=VIDEO_HEADER+frames*(U32)frameBytes;length=(U32)lseek(vf,0L,2);
     if(length!=expected)return fail(14);
+    if(cga100&&(width!=160||height!=100))return fail(81);
     xByte=(320-width)/4;yTop=(200-height)/2;return 1;
 }
 static int fetchEvent(void)
@@ -289,6 +299,7 @@ static int openSpeech(void)
 {
     int f;U8 h[12];unsigned i,n,got;U32 total=0,previous=0;CLIP *c;
     if(access("SPEECH.PCM",0)!=0)return 1;
+    if(cga100)return fail(89);
     if(_dos_open("SPEECH.PCM",O_RDONLY,&f))return fail(60);
     if(!readExact(f,h,8)||memcmp(h,"SPC1",4)||wordAt(h+6)||
        !(n=wordAt(h+4))||n>MAX_CLIPS){_dos_close(f);return fail(61);}
@@ -431,10 +442,87 @@ static int speechService(U32 now)
     }
     return 1;
 }
+/* Opt-in CGA100 attribute-span stream; no change to default Tandy mode. */
+static int openDelta(void)
+{
+    U8 h[24];if(!preencoded)return 1;
+    if(!cga100||_dos_open("MOVIE.WZD",O_RDONLY,&df))return fail(80);
+    if(!readExact(df,h,24)||memcmp(h,"WZD1",4)||wordAt(h+4)!=160||
+       wordAt(h+6)!=100||wordAt(h+8)!=fps||wordAt(h+10)!=24||
+       longAt(h+12)!=frames||longAt(h+16)!=duration||longAt(h+20)!=32000UL)
+        return fail(82);
+    return 1;
+}
+static int controls(void)
+{
+    unsigned k=KeyRead();if(k==3||k==27||k==32)interrupted=1;
+    return interrupted==0;
+}
+static int deltaService(U32 now)
+{
+    U8 h[4];U32 len,t,late,spent;unsigned n,pos,off,count,end=0,done,chunk,tail;
+    if(deltaNext>=frames||now<deltaNext*1000UL/fps)return 1;
+    late=now-deltaNext*1000UL/fps;
+    if(late){videoLate++;if(late>maxVideoLate)maxVideoLate=late;}
+    t=ClockTick();if(!readExact(df,h,4))return fail(83);videoBytes+=4;
+    len=longAt(h);if(len>32000UL)return fail(84);n=(unsigned)len;
+    for(done=0;done<n;done+=chunk){
+        chunk=n-done;if(chunk>4096)chunk=4096;
+        if(!readExact(df,pixels+done,chunk))return fail(85);
+        videoBytes+=chunk;if(!controls())return 1;
+    }
+    spent=since(t,ClockTick());readTicks+=spent;
+    if(spent>maxVideoRead)maxVideoRead=spent;t=ClockTick();
+    /* Bounds and ordering are checked before any frame writes. */
+    pos=0;
+    while(pos<n){
+        if(n-pos<4)return fail(86);
+        off=wordAt(pixels+pos);count=wordAt(pixels+pos+2);pos+=4;
+        if(!count||count>8000||!(off&1)||off<end||off>=16000||
+           (U32)off+(U32)count*2UL>16001UL||count>n-pos)return fail(86);
+        pos+=count;end=off+count*2;
+    }
+    parseTicks+=since(t,ClockTick());t=ClockTick();pos=0;
+    while(pos<n){
+        off=wordAt(pixels+pos);count=wordAt(pixels+pos+2);pos+=4;
+        deltaSpans++;deltaBytes+=count;
+        for(done=0;done<count;done+=chunk){
+            chunk=count-done;if(chunk>512)chunk=512;
+            CgaBatch(pixels+pos+done,off+done*2,chunk);
+            if(!controls())return 1;
+        }
+        pos+=count;
+    }
+    spent=since(t,ClockTick());drawTicks+=spent;
+    if(spent>maxDraw)maxDraw=spent;
+    lastFrame=deltaNext++;rendered++;
+    if(deltaNext==frames&&(_dos_read(df,h,1,&tail)||tail))return fail(88);
+    return 1;
+}
+static void captureCrt(char *name)
+{
+    U8 values[16];unsigned i,f,got;
+    if(!snapshot||!cga100)return;
+    for(i=0;i<16;i++){outp(0x3d4,i);values[i]=(U8)inp(0x3d5);}
+    if(!_dos_creat(name,0,&f)){_dos_write(f,(void _far *)values,16,&got);_dos_close(f);}
+}
+static void captureVideo(void)
+{
+    unsigned f,done,got,n;void _far *data;
+    if(!snapshot||!displayChanged)return;
+    if(_dos_creat("VRAM.BIN",0,&f)){snapshotError=1;return;}
+    n=cga100?16000:32768U;
+    for(done=0;done<n;done+=got){
+        got=n-done;if(got>4096)got=4096;data=(void _far *)(0xb8000000UL+done);
+        if(_dos_write(f,data,got,&got)||!got){snapshotError=1;break;}
+    }
+    _dos_close(f);
+}
 static int videoService(U32 now)
 {
     U32 frame,t,spent,offset;unsigned y,screenY,bankOffset,done,chunk;
     if(!(mode&2))return 1;
+    if(preencoded)return deltaService(now);
     frame=now*fps/1000UL;if(frame>=frames)frame=frames-1;
     if(frame==lastFrame)return 1;
     if(lastFrame!=0xffffffffUL&&frame>lastFrame+1){
@@ -446,7 +534,8 @@ static int videoService(U32 now)
     for(done=0;done<frameBytes;done+=chunk){
         chunk=frameBytes-done;if(chunk>4096)chunk=4096;
         if(!readExact(vf,pixels+done,chunk))return fail(15);
-        spent=since(t,ClockTick());if(spent>maxVideoRead)maxVideoRead=spent;
+        videoBytes+=chunk;if(cga100&&!controls())return 1;
+        spent=since(t,ClockTick());readTicks+=spent;if(spent>maxVideoRead)maxVideoRead=spent;
         now=elapsed();if(now>=playEnd)return 1;
         /* DOS read has returned before servicing the independent music handle. */
         if(!musicService(now))return 0;
@@ -455,10 +544,12 @@ static int videoService(U32 now)
     t=ClockTick();
     for(y=0;y<height;y++){
         screenY=y+yTop;bankOffset=(screenY&3)*8192+(screenY>>2)*160+xByte;
-        VideoRow(pixels+y*rowBytes,bankOffset,rowBytes);
+        if(cga100)CgaRow(pixels+y*rowBytes,y*160+1,rowBytes);
+        else VideoRow(pixels+y*rowBytes,bankOffset,rowBytes);
         if((y&15)==15||y+1==height){
-            spent=since(t,ClockTick());if(spent>maxDraw)maxDraw=spent;
+            spent=since(t,ClockTick());drawTicks+=spent;if(spent>maxDraw)maxDraw=spent;
             if(!musicService(elapsed()))return 0;
+            if(cga100&&!controls())return 1;
             t=ClockTick();
         }
     }
@@ -473,6 +564,9 @@ static void report(char *reason)
     fprintf(f,"width=%u\nheight=%u\nfps=%u\nduration_ms=%lu\nelapsed_ms=%lu\n",width,height,fps,duration,elapsedEnd);
     fprintf(f,"frames=%lu\ndropped_frames=%lu\nmusic_events_applied=%lu\nmusic_events_skipped=%lu\nmusic_events_read=%lu\n",rendered,dropped,applied,skipped,recordsRead);
     fprintf(f,"music_max_late_ms=%lu\nmusic_total_late_ms=%lu\nservice_max_gap_ms=%lu\n",maxLate,totalLate,maxGap);
+    fprintf(f,"cga100=%d\npreencoded=%d\nlast_frame=%lu\nvideo_bytes_read=%lu\n",cga100,preencoded,lastFrame,videoBytes);
+    fprintf(f,"delta_spans=%lu\ndelta_vram_bytes=%lu\nvideo_late_frames=%lu\nvideo_max_late_ms=%lu\nsnapshot_error=%u\n",deltaSpans,deltaBytes,videoLate,maxVideoLate,snapshotError);
+    fprintf(f,"read_total_ticks=%lu\nparse_total_ticks=%lu\ndraw_total_ticks=%lu\ndelta_copy_max_attributes=512\n",readTicks,parseTicks,drawTicks);
     fprintf(f,"video_read_chunk_bytes=4096\ndraw_batch_rows=16\n");
     fprintf(f,"video_read_max_ticks=%lu\nmusic_read_max_ticks=%lu\ndraw_max_ticks=%lu\n",maxVideoRead,maxMusicRead,maxDraw);
     fprintf(f,"play_start_ms=%lu\nplay_end_ms=%lu\nrun_elapsed_ms=%lu\nprerolled_records=%lu\nfull_range=%d\n",playStart,playEnd,elapsedEnd>=playStart?elapsedEnd-playStart:0UL,prerolled,fullRange);
@@ -503,21 +597,26 @@ int main(int argc,char **argv)
         case 'F':case 'f':fullRange=1;break;
 
         case 'L':case 'l':captionEnabled=1;break;
+        case 'C':case 'c':cga100=1;break;
+        case 'P':case 'p':preencoded=1;break;
+        case 'S':case 's':snapshot=1;break;
         default:goto usage;
         }
     }
     if(IsWindows()){puts("Exit Windows first. MOVPLAY needs exclusive Tandy hardware.");return 1;}
     r.h.ah=0x30;intdos(&r,&r);if(r.h.al<3){puts("DOS 3.0 or later required.");return 1;}
-    if(*(U8 _far *)0xfc000000UL!=0x21){puts("Tandy 1000 hardware required.");return 1;}
-    oldMode=VideoMode();haveHardware=1;mute();
+    if(cga100&&((mode&1)||captionEnabled)){puts("CGA100 requires /V without /L.");return 1;}
+    if(preencoded&&!cga100){puts("/P requires /C.");return 1;}
+    if(!cga100&&*(U8 _far *)0xfc000000UL!=0x21){puts("Tandy 1000 hardware required.");return 1;}
+    oldMode=VideoMode();haveHardware=!cga100;mute();
     oldBreak=_dos_getvect(0x23);oldCritical=_dos_getvect(0x24);
     _dos_setvect(0x23,onBreak);_harderr(onCritical);handlers=1;
     if(((mode&2)&&!openVideo())||((mode&1)&&!openMusic())||
-       !openCue()||!openInstrument()||!openSpeech()||!primeMusic()){
+       !openDelta()||!openCue()||!openInstrument()||!openSpeech()||!primeMusic()){
         reason="Error";goto done;
     }
     if(captionEnabled&&(mode&2)&&height<=160)captionStatus=CaptionLoad("MOVIE.LRC",duration);
-    if(mode&2){displayChanged=1;SetMode(9);if(VideoMode()!=9){fail(40);reason="Error";goto done;}}
+    if(mode&2){displayChanged=1;if(cga100)Cga100();else SetMode(9);if(!cga100&&VideoMode()!=9){fail(40);reason="Error";goto done;}}
     if(!_dos_creat("DOSSTART.LOG",0,&marker))_dos_close(marker);
     startTick=ClockTick();lastService=playStart;
     /* Prepare frame zero without consuming any timed score states.
@@ -544,10 +643,11 @@ int main(int argc,char **argv)
     }
     elapsedEnd=elapsed();
 done:
-    cleanup();report(reason);restoreHandlers();printf("MOVPLAY: %s. Error %d. See MOVPLAY.LOG.\n",reason,error);
+    if(preencoded&&!error&&!strcmp(reason,"Complete"))dropped=frames-rendered;
+    captureCrt("CGA.REG");captureVideo();cleanup();captureCrt("REST.REG");report(reason);restoreHandlers();printf("MOVPLAY: %s. Error %d. See MOVPLAY.LOG.\n",reason,error);
     if(speechGuarded||speechAvoided)puts("Some speech shortened/skipped to protect music. See MOVPLAY.LOG.");
     if(captionEnabled&&(mode&2)&&captionStatus<0)puts("Invalid subtitle file: captions disabled.");
     return error?1:0;
 usage:
-    puts("MOVPLAY [/F full video] [/L subtitles] [/A audio | /V video | /B both]\nNo options: full video with subtitles. Escape/Space: stop; relaunch to restart.");return 1;
+    puts("MOVPLAY [/F full video] [/L subtitles] [/A audio | /V video | /B both]\nExperimental /C: CGA100 video-only; /P: WZD1; /S: capture.\nNo options: full video with subtitles. Escape/Space: stop; relaunch to restart.");return 1;
 }

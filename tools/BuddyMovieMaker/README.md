@@ -162,6 +162,35 @@ Existing files/folders are rejected; failed/cancelled jobs remove staging;
 the same destination can be retried. Cancel after successful publication cannot
 undo a completed export. Closing while busy requests cancellation first.
 
+## Experimental CGA100 DOS playback
+
+The ordinary Tandy mode-9 commands and hardware check remain unchanged. The
+optional `/C` path uses actual 160x100 RGBI CGA text semigraphics and requires
+video-only `/V`; music/captions are unavailable and speech is rejected. `/P`
+adds the independently encoded `MOVIE.WZD` attribute-span stream. Build the
+runtime with its existing MSC6/MASM `Runtime/BUILD.BAT` (including `CGA100.ASM`).
+The existing `Build.ps1` already copies all runtime assembly sources.
+
+On a development host with Python 3, prepare a clean video-only output folder:
+
+```text
+python tools/BuddyMovieMaker/Cga/PACKCGA.PY input/MOVIE.WZV NEW_OUTPUT
+```
+
+Copy the rebuilt `MOVPLAY.EXE` into that folder and run `MOVPLAY /V /F /C /P`
+from DOS. Escape, Space or Ctrl-C stops and restores the prior BIOS mode.
+The encoder accepts packed RGBI 160x100 or Maker 256x160 input, resizes the
+latter with nearest-neighbor sampling, and retains source frames/rate/duration.
+`/S` optionally captures VRAM/CRTC after playback for developers.
+
+Short synthetic 4.77 MHz interpreted-8088/640 KB/IBM-CGA trials showed 64/64
+sparse 16 fps frames and 16/16 dense 4 fps frames; the opening image precedes
+the clock (63 timed sparse updates in 4.009 seconds). This is an opt-in
+experiment, not physical-hardware qualification. The sequential delta stream
+falls behind dense 8/16 fps input: measured pre-draw lateness reached 1.4/2.6
+seconds. No 30 fps or general dense-video rate is promised. `Cga/encode.py`
+also generates original short fixtures without third-party media.
+
 ## Developer build and tests
 
 Requires serviced .NET 8 SDK (8.0.425 tested), DOSBox-X and a separately supplied MSC6/MASM/DDK linker
