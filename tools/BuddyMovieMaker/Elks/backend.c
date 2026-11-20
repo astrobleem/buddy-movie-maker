@@ -8,12 +8,17 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <linuxmt/ntty.h>
+#include <linuxmt/mem.h>
+#include <arch/param.h>
 
 typedef volatile unsigned char __far *far_bytes;
 #define FAR(seg,off) ((far_bytes)(((unsigned long)(seg)<<16)|(unsigned)(off)))
 static far_bytes video=FAR(0xb800,0);
 static int console=-1,locked,raw,term_saved,changed;
 static unsigned ctrl;
+static volatile unsigned __far *ticks;
+static int clock_checked;
+static unsigned long input_at=~0UL;
 static volatile int stopped;
 static struct termios saved;
 struct screen_info screen_info;
@@ -47,6 +52,21 @@ static void on_signal(int sig) {(void)sig;stopped=1;}
 unsigned long clock_ms(void)
 {
     struct timeval t;
+    unsigned ds,off,hi,lo;int fd;
+    if(!clock_checked){
+        clock_checked=1;fd=open("/dev/kmem",O_RDONLY);
+        if(fd>=0){
+            if(!ioctl(fd,MEM_GETDS,&ds)&&!ioctl(fd,MEM_GETJIFFADDR,&off))
+                ticks=(volatile unsigned __far *)(((unsigned long)ds<<16)|off);
+            close(fd);
+        }
+    }
+    if(ticks){
+        /* Stock ELKS exposes a read-only jiffies address. High/low/high
+         * avoids tearing without masking the timer interrupt. */
+        do{hi=ticks[1];lo=ticks[0];}while(hi!=ticks[1]);
+        return (((unsigned long)hi<<16)|lo)*(1000/HZ);
+    }
     gettimeofday(&t,0);
     return (unsigned long)t.tv_sec*1000UL+(unsigned long)t.tv_usec/1000UL;
 }
@@ -57,8 +77,11 @@ static void drain(void)
 }
 int stop_requested(void)
 {
-    unsigned char bytes[16];int n,i;
-    if(console<0)return stopped!=0;
+    unsigned char bytes[16];int n,i;unsigned long now;
+    if(console<0||stopped)return stopped!=0;
+    /* Retry at the next stock kernel tick, rather than spending a system
+     * call on every sub-millisecond render chunk. Signals stay immediate. */
+    now=clock_ms();if(now==input_at)return 0;input_at=now;
     n=read(console,bytes,sizeof(bytes));
     for(i=0;i<n;i++){
         unsigned b=bytes[i];
@@ -134,6 +157,13 @@ void screen_close(void)
     if(locked){if(ioctl(console,DCREL_GRAPH,(void *)0)<0)screen_info.release_error=1;locked=0;}
     if(term_saved){if(tcsetattr(console,TCSAFLUSH,&saved)<0)screen_info.release_error=1;term_saved=0;}
     close(console);console=-1;
+}
+/* Stock bioshd's spin_timer() writes/clears character 79 even with the
+ * console graphics lock held. Restore that glyph after completed file I/O;
+ * preserve its movie attribute. Never write video before acquiring it. */
+void screen_after_io(void)
+{
+    if(changed)video[158]=0xde;
 }
 void fill_cells(unsigned cell,unsigned count,unsigned char value)
 {

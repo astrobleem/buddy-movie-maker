@@ -15,5 +15,8 @@ void screen_close(void);
 int stop_requested(void);
 void fill_cells(unsigned cell,unsigned count,unsigned char value);
 void copy_cells(unsigned cell,unsigned count,const unsigned char *source);
+void screen_after_io(void);
 int snapshot(const char *path);
+int validate_packet(const unsigned char *commands,unsigned len);
+int render_packet(const unsigned char *commands);
 #endif

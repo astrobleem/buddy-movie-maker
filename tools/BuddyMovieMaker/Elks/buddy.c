@@ -19,7 +19,7 @@ static U32 start,elapsed,read_ms,check_ms,draw_ms,max_read,max_poll,poll_at,vide
 static const char *error="",*reason="Complete";
 static inline unsigned word(const U8 *p) {return p[0]|((unsigned)p[1]<<8);}
 static inline U32 dword(const U8 *p) {return (U32)word(p)|((U32)word(p+2)<<16);}
-static int pump(void)
+int frame_pump(void)
 {
     U32 now=clock_ms(),gap=now-poll_at;
     if(poll_at&&gap>max_poll)max_poll=gap;
@@ -30,11 +30,11 @@ static int exact(void *data,unsigned count)
     U8 *p=data;unsigned n;int got;
     while(count){
         n=count;if(n>4096)n=4096;
-        got=read(file,p,n);
+        got=read(file,p,n);screen_after_io();
         if(got<0&&errno==EINTR&&!stop_requested())continue;
         if(got<=0)return 0;
         p+=got;count-=got;
-        if(!pump())return 0;
+        if(!frame_pump())return 0;
     }
     return 1;
 }
@@ -63,24 +63,10 @@ static int open_movie(const char *path)
     if(!packet){error="not enough memory for frame packet";return 0;}
     return 1;
 }
-/* Same complete-packet checks as DOS CgaCheck, before any frame writes. */
-static int validate(unsigned len)
-{
-    unsigned pos=0,cells=0,count,cmd;
-    while(pos<len){
-        if(len-pos<2)return 0;
-        cmd=word(packet+2+pos);pos+=2;count=cmd&0x7fff;
-        if(!count||count>8000-cells)return 0;
-        cells+=count;
-        if(cmd&0x8000){if(pos==len)return 0;pos++;}
-        else {if(count>len-pos)return 0;pos+=count;}
-    }
-    return cells==8000;
-}
 static int draw_frame(U32 frame,int opening)
 {
     unsigned n=(unsigned)(offsets[frame+1]-offsets[frame]);
-    unsigned pos,len,cmd,count,cells=0,chunk,budget=512;U8 value;
+    unsigned len;
     U32 t=clock_ms(),spent;
     if(lseek(file,(long)offsets[frame],SEEK_SET)!=(long)offsets[frame]||!exact(packet,n)){
         error="frame read failed";return 0;
@@ -88,19 +74,9 @@ static int draw_frame(U32 frame,int opening)
     video_bytes+=n;spent=clock_ms()-t;read_ms+=spent;if(spent>max_read)max_read=spent;
     if(!opening&&clock_ms()-start>=duration)return 1;
     t=clock_ms();len=word(packet);
-    if(!len||len>n-2||!validate(len)){error="invalid run packet";return 0;}
-    check_ms+=clock_ms()-t;t=clock_ms();pos=2;len+=2;
-    while(pos<len){
-        cmd=word(packet+pos);pos+=2;count=cmd&0x7fff;
-        value=0;if(cmd&0x8000)value=packet[pos++];
-        while(count){
-            chunk=count;if(chunk>budget)chunk=budget;
-            if(cmd&0x8000)fill_cells(cells,chunk,value);
-            else {copy_cells(cells,chunk,packet+pos);pos+=chunk;}
-            cells+=chunk;count-=chunk;budget-=chunk;
-            if(!budget){if(!pump())return 0;budget=512;}
-        }
-    }
+    if(!len||len>n-2||!validate_packet(packet+2,len)){error="invalid run packet";return 0;}
+    check_ms+=clock_ms()-t;t=clock_ms();
+    if(!render_packet(packet+2))return 0;
     draw_ms+=clock_ms()-t;
     last=frame;rendered++;return 1;
 }
@@ -118,7 +94,7 @@ int main(int argc,char **argv)
     start=clock_ms();poll_at=start;
     for(;;){
         now=clock_ms()-start;
-        if(!pump()){reason="Stopped";result=0;break;}
+        if(!frame_pump()){reason="Stopped";result=0;break;}
         if(now>=duration){result=0;break;}
         target=now*fps/1000UL;if(target>=frames)target=frames-1;
         if(target!=last){if(!draw_frame(target,0))break;}
