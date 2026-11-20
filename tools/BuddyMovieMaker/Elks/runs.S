@@ -24,11 +24,24 @@ render_cga_packet:
  lodsw
  mov %ax,%dx
  and $0x7fff,%dx
- test $0x8000,%ax
- jz .Lliteral
+ /* The validated command sign distinguishes fill from literal. */
+ test %ax,%ax
+ jns .Lliteral
  lodsb
  mov %al,%ah
  mov $0xde,%al
+ /* Common short fill fits the remaining 512-cell input-service budget.
+  * REP STOSW preserves the SUB flags, so its zero budget falls through
+  * to the same control poll. Large fills retain the original split path. */
+ cmp %bx,%dx
+ ja .Lfill
+ mov %dx,%cx
+ sub %dx,%bx
+ rep stosw
+ jnz .Lcommand
+ call .Lpoll
+ jz .Labort
+ jmp .Lcommand
 .Lfill:
  mov %dx,%cx
  cmp %bx,%cx
