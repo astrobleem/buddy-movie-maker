@@ -3,8 +3,8 @@ Python 3 on a development host. GPL-3.0, matching the DOS runtime.
 """
 from pathlib import Path
 import argparse,struct
-from encode import spans,full_frame_if_larger
-p=argparse.ArgumentParser();p.add_argument('movie',type=Path);p.add_argument('out',type=Path);a=p.parse_args()
+from encode import spans,full_frame_if_larger,runs_if_smaller
+p=argparse.ArgumentParser();p.add_argument('movie',type=Path);p.add_argument('out',type=Path);p.add_argument('--runs',action='store_true',help='try independent run/fill frames, keeping the smaller fallback');a=p.parse_args()
 with a.movie.open('rb') as f:
  h=f.read(24)
  if len(h)!=24:raise SystemExit('Short video header')
@@ -30,4 +30,5 @@ with a.movie.open('rb') as f:
    v.write(frame);packet=spans(frame,previous);d.write(struct.pack('<I',len(packet)));d.write(packet);previous=frame
  (a.out/'MOVIE.CUE').write_bytes(struct.pack('<4sIII',b'WZC1',ms,0,ms))
 full_frame_if_larger(a.out)
+if a.runs:runs_if_smaller(a.out)
 print('Created video-only CGA export:',a.out,'frames:',n,'fps:',fps)

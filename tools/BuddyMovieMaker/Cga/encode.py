@@ -65,3 +65,49 @@ def make(folder,w,h,fps,sparse=True,seconds=4):
  print(folder.name,n,'frames; raw', (folder/'MOVIE.WZV').stat().st_size,'encoded',(folder/'MOVIE.WZD').stat().st_size if d else 0)
 if __name__=='__main__':
  make(Q/'S16',160,100,16);make(Q/'N8',160,100,8,False);make(Q/'N16',160,100,16,False);make(Q/'AUDIO',256,160,8)
+
+def run_packet(frame):
+ """Original lossless literal/fill encoding of one independent CGA frame."""
+ out=bytearray();i=0
+ while i<len(frame):
+  end=i+1
+  while end<len(frame) and frame[end]==frame[i]:end+=1
+  if end-i>=4:
+   out+=struct.pack('<HB',0x8000|(end-i),frame[i]);i=end;continue
+  start=i;i=end
+  while i<len(frame):
+   end=i+1
+   while end<len(frame) and frame[end]==frame[i]:end+=1
+   if end-i>=4:break
+   i=end
+  out+=struct.pack('<H',i-start)+frame[start:i]
+ return out
+
+def runs_if_smaller(folder):
+ """Replace the sidecar only if independent runs beat the existing fallback.
+ WZR1: 24-byte metadata, sector-aligned header and frames. Header index has
+ frames+1 absolute DWORD offsets; packet is WORD byte count, then commands.
+ Command WORD: high bit fill, low 15 bits cell count; one fill attribute or
+ count literal attributes follows. Every packet produces exactly 8000 cells.
+ """
+ raw=folder/'MOVIE.WZV';sidecar=folder/'MOVIE.WZD';temporary=folder/'RUNS.TMP'
+ with raw.open('rb') as f:
+  magic,w,h,fps,hs,n,ms,size=struct.unpack('<4s4H3I',f.read(24))
+  head=(24+(n+1)*4+511)&~511;offsets=[head]
+  with temporary.open('w+b') as d:
+   d.write(bytes(head))
+   for k in range(n):
+    frame=f.read(8000)
+    if len(frame)!=8000:raise ValueError('Truncated run input')
+    packet=run_packet(frame)
+    if not packet or len(packet)+2>16384:raise ValueError('Run packet exceeds bound')
+    d.write(struct.pack('<H',len(packet)));d.write(packet)
+    d.write(bytes((-d.tell())&511));offsets.append(d.tell())
+   d.seek(0);d.write(struct.pack('<4s4H3I',b'WZR1',w,h,fps,head,n,ms,16384))
+   d.write(struct.pack('<'+'I'*len(offsets),*offsets))
+ old_size=sidecar.stat().st_size
+ with sidecar.open('rb') as old:old_head=struct.unpack_from('<H',old.read(24),10)[0]
+ # Header savings alone do not justify decoding an incompressible frame.
+ if temporary.stat().st_size<old_size and (offsets[-1]-head)*4<=(old_size-old_head)*3:
+  temporary.replace(sidecar);return True
+ temporary.unlink();return False

@@ -27,8 +27,13 @@ extern unsigned _cdecl IsWindows(void);
 extern void _cdecl Cga100(void);
 extern void _cdecl CgaRow(U8 *,unsigned,unsigned);
 extern void _cdecl CgaBatch(U8 *,unsigned,unsigned);
+extern void _cdecl CgaRuns(U8 *);
+extern unsigned _cdecl CgaCheck(U8 *,unsigned,unsigned *);
 static int cga100,preencoded,snapshot,df=-1,fullFrames;
 static U32 fullCursor,maxPresentLate;
+static int runFrames,standalone;
+static U32 _far *runOffsets;
+static U32 runPackets,runFillCells,runLiteralCells,runFileBytes;
 static U32 deltaNext,videoLate,maxVideoLate,deltaBytes,deltaSpans,videoBytes;
 static U32 readTicks,drawTicks,parseTicks;
 static unsigned snapshotError;
@@ -111,6 +116,7 @@ static void cleanup(void)
 {
     unsigned i;
     mute();
+    if(runOffsets){_ffree(runOffsets);runOffsets=0;}
     for(i=0;i<clipCount;i++)if(clips[i].data){_ffree(clips[i].data);clips[i].data=0;}
     if(displayChanged){SetMode(oldMode);displayChanged=0;}
     if(vf>=0){_dos_close(vf);vf=-1;}
@@ -122,9 +128,23 @@ static void restoreHandlers(void)
 {
     if(handlers){_dos_setvect(0x23,oldBreak);_dos_setvect(0x24,oldCritical);handlers=0;}
 }
+static int openRunVideo(void)
+{
+    U8 h[24];unsigned f;int ok;
+    if(_dos_open("MOVIE.WZD",O_RDONLY,&f))return fail(10);
+    ok=readExact(f,h,24);_dos_close(f);
+    if(!ok||memcmp(h,"WZR1",4)||wordAt(h+4)!=160||wordAt(h+6)!=100)return fail(12);
+    width=160;height=100;fps=wordAt(h+8);frameBytes=8000;rowBytes=80;
+    frames=longAt(h+12);duration=longAt(h+16);
+    if((fps!=2&&fps!=4&&fps!=8&&fps!=16)||!frames||frames>9600UL||
+       !duration||duration>600000UL||duration>frames*1000UL/fps||
+       duration<=(frames-1)*1000UL/fps)return fail(13);
+    return 1;
+}
 static int openVideo(void)
 {
     U8 h[VIDEO_HEADER];U32 length,expected,step;
+    if(standalone)return openRunVideo();
     if(_dos_open("MOVIE.WZV",O_RDONLY,&vf))return fail(10);
     if(!readExact(vf,h,VIDEO_HEADER))return fail(11);
     width=wordAt(h+4);height=wordAt(h+6);fps=wordAt(h+8);
@@ -181,6 +201,7 @@ static int openMusic(void)
 static int openCue(void)
 {
     int f;U8 h[16];long length;
+    if(standalone){playStart=0;playEnd=duration;return 1;}
     if(_dos_open("MOVIE.CUE",O_RDONLY,&f))return fail(50);
     length=lseek(f,0L,2);
     if(length!=16L||lseek(f,0L,0)!=0L||!readExact(f,h,16)){
@@ -446,12 +467,28 @@ static int speechService(U32 now)
 /* Opt-in CGA100 attribute-span stream; no change to default Tandy mode. */
 static int openDelta(void)
 {
-    U8 h[24];if(!preencoded)return 1;
+    U8 h[24];U32 i,length,head;unsigned got,indexBytes;if(!preencoded)return 1;
     if(!cga100||_dos_open("MOVIE.WZD",O_RDONLY,&df))return fail(80);
     if(!readExact(df,h,24)||
-       (memcmp(h,"WZD1",4)&&memcmp(h,"WZF1",4))||wordAt(h+4)!=160||
+       (memcmp(h,"WZD1",4)&&memcmp(h,"WZF1",4)&&memcmp(h,"WZR1",4))||wordAt(h+4)!=160||
        wordAt(h+6)!=100||wordAt(h+8)!=fps||
        longAt(h+12)!=frames||longAt(h+16)!=duration)return fail(82);
+    runFrames=!memcmp(h,"WZR1",4);
+    if(runFrames){
+        head=(24UL+(frames+1)*4UL+511UL)&~511UL;
+        if(wordAt(h+10)!=head||longAt(h+20)!=16384UL)return fail(82);
+        indexBytes=(unsigned)((frames+1)*4UL);
+        runOffsets=(U32 _far *)_fmalloc(indexBytes);
+        if(!runOffsets)return fail(90);
+        if(_dos_read(df,runOffsets,indexBytes,&got)||got!=indexBytes)return fail(82);
+        length=(U32)lseek(df,0L,2);
+        if((length&511UL)||runOffsets[0]!=head||runOffsets[frames]!=length)return fail(82);
+        for(i=0;i<frames;i++){
+            if((runOffsets[i]&511UL)||runOffsets[i+1]<=runOffsets[i]||
+               runOffsets[i+1]-runOffsets[i]>16384UL)return fail(82);
+        }
+        fullCursor=length;runFileBytes=length;return 1;
+    }
     fullFrames=!memcmp(h,"WZF1",4);
     if(fullFrames){
         if(wordAt(h+10)!=4096||longAt(h+20)!=8192UL)return fail(82);
@@ -464,6 +501,44 @@ static int controls(void)
 {
     unsigned k=KeyRead();if(k==3||k==27||k==32)interrupted=1;
     return interrupted==0;
+}
+/* Called by the original run writer after at most 512 output cells. */
+unsigned _cdecl CgaPoll(void) {return (unsigned)controls();}
+/* WZR1 packets are independent. Validate every command before VRAM writes. */
+static int runsService(U32 now)
+{
+    U32 frame,offset,t,spent,late;unsigned n,len,done,chunk,fills;
+    frame=now*fps/1000UL;if(frame>=frames)frame=frames-1;
+    if(frame==lastFrame)return 1;
+    late=now-frame*1000UL/fps;
+    if(late){videoLate++;if(late>maxVideoLate)maxVideoLate=late;}
+    if(lastFrame!=0xffffffffUL&&frame>lastFrame+1)dropped+=frame-lastFrame-1;
+    offset=runOffsets[frame];n=(unsigned)(runOffsets[frame+1]-offset);
+    t=ClockTick();
+    if(fullCursor!=offset&&lseek(df,(long)offset,0)!=(long)offset)return fail(85);
+    for(done=0;done<n;done+=chunk){
+        chunk=n-done;if(chunk>4096)chunk=4096;
+        if(!readExact(df,pixels+done,chunk))return fail(85);
+        fullCursor=offset+done+chunk;videoBytes+=chunk;
+        if(!controls()||(!openingFrame&&elapsed()>=playEnd)){
+            spent=since(t,ClockTick());readTicks+=spent;
+            if(spent>maxVideoRead)maxVideoRead=spent;return 1;
+        }
+    }
+    spent=since(t,ClockTick());readTicks+=spent;
+    if(spent>maxVideoRead)maxVideoRead=spent;
+    if(!controls()||(!openingFrame&&elapsed()>=playEnd))return 1;
+    t=ClockTick();len=wordAt(pixels);
+    if(len>n-2||!len)return fail(91);
+    if(!CgaCheck(pixels+2,len,&fills))return fail(91);
+    runFillCells+=fills;runLiteralCells+=8000-fills;
+    parseTicks+=since(t,ClockTick());t=ClockTick();
+    CgaRuns(pixels+2);
+    spent=since(t,ClockTick());drawTicks+=spent;
+    if(spent>maxDraw)maxDraw=spent;
+    if(interrupted)return 1;
+    if(!openingFrame){late=elapsed()-frame*1000UL/fps;if(late>maxPresentLate)maxPresentLate=late;}
+    lastFrame=frame;rendered++;runPackets++;return 1;
 }
 /* Dense frames are independent and aligned for DOS sector/cluster reads.
  * Follow the existing video clock, counting skipped source frames explicitly. */
@@ -507,6 +582,7 @@ static int fullService(U32 now)
 static int deltaService(U32 now)
 {
     U8 h[4];U32 len,t,late,spent;unsigned n,pos,off,count,end=0,done,chunk,tail;
+    if(runFrames)return runsService(now);
     if(fullFrames)return fullService(now);
     if(deltaNext>=frames||now<deltaNext*1000UL/fps)return 1;
     late=now-deltaNext*1000UL/fps;
@@ -611,6 +687,7 @@ static void report(char *reason)
     fprintf(f,"width=%u\nheight=%u\nfps=%u\nduration_ms=%lu\nelapsed_ms=%lu\n",width,height,fps,duration,elapsedEnd);
     fprintf(f,"frames=%lu\ndropped_frames=%lu\nmusic_events_applied=%lu\nmusic_events_skipped=%lu\nmusic_events_read=%lu\n",rendered,dropped,applied,skipped,recordsRead);
     fprintf(f,"music_max_late_ms=%lu\nmusic_total_late_ms=%lu\nservice_max_gap_ms=%lu\n",maxLate,totalLate,maxGap);
+    fprintf(f,"run_frames=%d\nrun_packets=%lu\nrun_fill_cells=%lu\nrun_literal_cells=%lu\nrun_file_bytes=%lu\n",runFrames,runPackets,runFillCells,runLiteralCells,runFileBytes);
     fprintf(f,"bulk_full_frames=%d\nvideo_max_present_late_ms=%lu\n",fullFrames,maxPresentLate);
     fprintf(f,"cga100=%d\npreencoded=%d\nlast_frame=%lu\nvideo_bytes_read=%lu\n",cga100,preencoded,lastFrame,videoBytes);
     fprintf(f,"delta_spans=%lu\ndelta_vram_bytes=%lu\nvideo_late_frames=%lu\nvideo_max_late_ms=%lu\nsnapshot_error=%u\n",deltaSpans,deltaBytes,videoLate,maxVideoLate,snapshotError);
@@ -645,6 +722,7 @@ int main(int argc,char **argv)
         case 'F':case 'f':fullRange=1;break;
 
         case 'L':case 'l':captionEnabled=1;break;
+        case 'R':case 'r':standalone=1;cga100=preencoded=fullRange=1;mode=2;break;
         case 'C':case 'c':cga100=1;break;
         case 'P':case 'p':preencoded=1;break;
         case 'S':case 's':snapshot=1;break;
@@ -697,5 +775,5 @@ done:
     if(captionEnabled&&(mode&2)&&captionStatus<0)puts("Invalid subtitle file: captions disabled.");
     return error?1:0;
 usage:
-    puts("MOVPLAY [/F full video] [/L subtitles] [/A audio | /V video | /B both]\nExperimental /C: CGA100 video-only; /P: WZD1/WZF1; /S: capture.\nNo options: full video with subtitles. Escape/Space: stop; relaunch to restart.");return 1;
+    puts("MOVPLAY [/F full video] [/L subtitles] [/A audio | /V video | /B both]\nExperimental /R: standalone WZR1. /C: CGA100 video-only; /P: WZD1/WZF1/WZR1; /S: capture.\nNo options: full video with subtitles. Escape/Space: stop; relaunch to restart.");return 1;
 }
