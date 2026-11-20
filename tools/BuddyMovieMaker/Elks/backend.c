@@ -18,6 +18,8 @@ static int console=-1,locked,raw,term_saved,changed;
 static unsigned ctrl;
 static volatile unsigned __far *ticks;
 static int clock_checked;
+static int vga;
+static unsigned pairs[16];
 static unsigned long input_at=~0UL;
 static volatile int stopped;
 static struct termios saved;
@@ -106,12 +108,19 @@ int screen_open(void)
     locked=1;
     screen_info.old_mode=bios(0x0f00,0)&0x7f;
     screen_info.old_rows=crt(6);
-    screen_error="first fullscreen backend requires ordinary IBM-compatible CGA text mode 3";
+    screen_error="fullscreen playback requires initial BIOS text mode 3";
     if(screen_info.old_mode!=3)goto bad;
     ax=bios(0x1a00,&bx);
-    if((ax&255)==0x1a&&(bx&255)!=2)goto bad; /* DCC 2 is CGA. */
-    bx=0xff10;bios(0x1200,&bx);
-    if(!(bx&0xff00)&&(bx&255)<=3)goto bad; /* EGA */
+    if((ax&255)==0x1a){
+        unsigned adapter=bx&255;
+        vga=adapter==7||adapter==8;
+        screen_error="requires CGA, Tandy CGA-compatible video, or BIOS VGA";
+        if(!vga&&adapter!=2)goto bad;
+    }
+    if(!vga){
+        bx=0xff10;bios(0x1200,&bx);
+        if(!(bx&0xff00)&&(bx&255)<=3)goto bad; /* EGA */
+    }
     screen_error="PCjr shared-memory layout is unsupported";
     if(*FAR(0xfc00,0)!=0x21&&*FAR(0xf000,0xfffe)==0xfd)goto bad;
     if(*FAR(0xfc00,0)==0x21){
@@ -130,7 +139,31 @@ int screen_open(void)
     drain();
     if(ioctl(console,DCSET_KRAW,(void *)0)>=0)raw=1;
     signal(SIGINT,on_signal);signal(SIGTERM,on_signal);signal(SIGHUP,on_signal);
-    changed=1;bios(3,0);
+    changed=1;
+    if(vga){
+        bios(0x13,0);
+        screen_error="VGA BIOS mode 13h unavailable";
+        if((bios(0x0f00,0)&0x7f)!=0x13)goto bad;
+        video=FAR(0xa000,0);
+        /* Explicit standard RGBI DAC; do not rely on a BIOS palette. */
+        outbyte(0x3c8,0);
+        for(i=0;i<16;i++){
+            unsigned bright=(i&8)?21:0;
+            unsigned red=((i&4)?42:0)+bright;
+            unsigned green=((i&2)?42:0)+bright;
+            unsigned blue=((i&1)?42:0)+bright;
+            if(i==6)green=21;
+            outbyte(0x3c9,(unsigned char)red);
+            outbyte(0x3c9,(unsigned char)green);
+            outbyte(0x3c9,(unsigned char)blue);
+            pairs[i]=i|(i<<8);
+        }
+        screen_info.installed_mode=0x13;
+        screen_info.installed_rows=crt(6);
+        screen_info.installed_scanline=crt(9);
+        screen_error="";return 1;
+    }
+    bios(3,0);
     outbyte(0x3d8,1);
     for(i=0;i<16;i++)reg(i,regs[i]);
     *FAR(0x40,0x65)=9;
@@ -163,7 +196,45 @@ void screen_close(void)
  * preserve its movie attribute. Never write video before acquiring it. */
 void screen_after_io(void)
 {
-    if(changed)video[158]=0xde;
+    if(changed&&!vga)video[158]=0xde;
+}
+/* Same 160x100 pixels, doubled to 320x200 in VGA's separate framebuffer.
+ * WZR1 high nibble is left, low nibble right; input bytes never change. */
+static void vga_cells(unsigned cell,unsigned count,unsigned char value,const unsigned char *source)
+{
+    unsigned row,x,n,off,off2,i,left,right;unsigned char byte;
+    while(count){
+        row=cell/80;x=cell%80;n=80-x;if(n>count)n=count;
+        off=row*640+x*4;off2=off+320;
+        for(i=0;i<n;i++){
+            byte=source?*source++:value;left=pairs[byte>>4];right=pairs[byte&15];
+            *(volatile unsigned __far *)(video+off)=left;
+            *(volatile unsigned __far *)(video+off+2)=right;
+            *(volatile unsigned __far *)(video+off2)=left;
+            *(volatile unsigned __far *)(video+off2+2)=right;
+            off+=4;off2+=4;
+        }
+        cell+=n;count-=n;
+    }
+}
+int render_cga_packet(const unsigned char *commands);
+int frame_pump(void);
+int render_packet(const unsigned char *commands)
+{
+    unsigned cmd,count,cell=0,n,budget=512;unsigned char value;
+    if(!vga)return render_cga_packet(commands);
+    while(cell<8000){
+        cmd=commands[0]|((unsigned)commands[1]<<8);commands+=2;
+        count=cmd&0x7fff;value=0;if(cmd&0x8000)value=*commands++;
+        while(count){
+            n=count;if(n>budget)n=budget;
+            vga_cells(cell,n,value,(cmd&0x8000)?0:commands);
+            if(!(cmd&0x8000))commands+=n;
+            cell+=n;count-=n;budget-=n;
+            if(!budget){if(!frame_pump())return 0;budget=512;}
+        }
+    }
+    return 1;
 }
 void fill_cells(unsigned cell,unsigned count,unsigned char value)
 {
@@ -182,8 +253,8 @@ int snapshot(const char *path)
     if(!path)return 1;
     fd=open(path,O_WRONLY|O_CREAT|O_TRUNC,0644);
     if(fd<0)return 0;
-    while(off<16000){
-        n=16000-off;if(n>sizeof(buf))n=sizeof(buf);
+    while(off<(vga?64000U:16000U)){
+        n=(vga?64000U:16000U)-off;if(n>sizeof(buf))n=sizeof(buf);
         for(i=0;i<n;i++)buf[i]=video[off+i];
         got=write(fd,buf,n);
         if(got!=(int)n){close(fd);return 0;}

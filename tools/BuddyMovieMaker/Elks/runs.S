@@ -3,9 +3,9 @@
  * cells. Hardware interrupts remain enabled. Poll after each 512 cells. */
 .code16
 .text
-.global render_packet
-.type render_packet,@function
-render_packet:
+.global render_cga_packet
+.type render_cga_packet,@function
+render_cga_packet:
  push %bp
  push %bx
  push %si
@@ -88,7 +88,7 @@ render_packet:
  pop %ax
  mov $512,%bx
  ret
-.size render_packet,.-render_packet
+.size render_cga_packet,.-render_cga_packet
 
 /* AX commands, DX byte length. Check every command before VRAM ownership. */
 .global validate_packet
