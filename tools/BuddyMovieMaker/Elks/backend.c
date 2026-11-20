@@ -10,6 +10,7 @@
 #include <linuxmt/ntty.h>
 #include <linuxmt/mem.h>
 #include <arch/param.h>
+#include <malloc.h>
 
 typedef volatile unsigned char __far *far_bytes;
 #define FAR(seg,off) ((far_bytes)(((unsigned long)(seg)<<16)|(unsigned)(off)))
@@ -261,4 +262,37 @@ int snapshot(const char *path)
         off+=n;
     }
     return close(fd)==0;
+}
+
+/* Optional bounded cache uses memory owned by the stock ELKS allocator,
+ * never a guessed physical RAM range. All transfers are even-sized WZR1
+ * sector spans. Keep DS unchanged so asynchronous signal handlers are safe. */
+static unsigned short cache_segment;
+int movie_cache_open(unsigned bytes)
+{
+    if(!bytes||bytes>61440U)return 0;
+    return _fmemalloc((bytes+15U)>>4,&cache_segment)==0;
+}
+void movie_cache_put(unsigned offset,const void *data,unsigned bytes)
+{
+    unsigned src=(unsigned)data,words=bytes>>1;
+    __asm__ volatile("push %%es\n\tmov %%ax,%%es\n\tcld\n\trep movsw\n\tpop %%es"
+        : "+S"(src),"+D"(offset),"+c"(words) : "a"(cache_segment) : "cc","memory");
+}
+void movie_cache_get(void *data,unsigned offset,unsigned bytes)
+{
+    /* WZR1 sectors are multiples of 512. Copy four words per branch;
+     * source uses ES overrides, leaving DS and interrupts untouched. */
+    unsigned dest=(unsigned)data,groups=bytes>>3,seg=cache_segment;
+    __asm__ volatile("push %%es\n\tmov %%ax,%%es\n\tcld\n\t"
+        "1: es lodsw\n\tmov %%ax,(%%di)\n\tes lodsw\n\tmov %%ax,2(%%di)\n\t"
+        "es lodsw\n\tmov %%ax,4(%%di)\n\tes lodsw\n\tmov %%ax,6(%%di)\n\t"
+        "add $8,%%di\n\tloop 1b\n\tpop %%es"
+        : "+S"(offset),"+D"(dest),"+c"(groups),"+a"(seg) : : "cc","memory");
+}
+int movie_cache_close(void)
+{
+    int ok=1;
+    if(cache_segment){ok=_fmemfree(cache_segment)==0;cache_segment=0;}
+    return ok;
 }

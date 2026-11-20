@@ -18,5 +18,9 @@ void copy_cells(unsigned cell,unsigned count,const unsigned char *source);
 void screen_after_io(void);
 int snapshot(const char *path);
 int validate_packet(const unsigned char *commands,unsigned len);
+int movie_cache_open(unsigned bytes);
+void movie_cache_put(unsigned offset,const void *data,unsigned bytes);
+void movie_cache_get(void *data,unsigned offset,unsigned bytes);
+int movie_cache_close(void);
 int render_packet(const unsigned char *commands);
 #endif
