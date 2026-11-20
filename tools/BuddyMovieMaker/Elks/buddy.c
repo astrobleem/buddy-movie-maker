@@ -32,7 +32,7 @@ static int exact(void *data,unsigned count)
     U8 *p=data;unsigned n;int got;
     while(count){
         n=count;if(n>4096)n=4096;
-        got=read(file,p,n);screen_after_io();
+        got=read(file,p,n);
         if(got<0&&errno==EINTR&&!stop_requested())continue;
         if(got<=0)return 0;
         p+=got;count-=got;
@@ -162,7 +162,7 @@ done:
     printf("read_ms=%lu validate_ms=%lu draw_ms=%lu\n",read_ms,check_ms,draw_ms);
     printf("max_read_ms=%lu max_service_gap_ms=%lu\n",max_read,max_poll);
     printf("mode=%u restored=%u release_error=%d\n",screen_info.old_mode,screen_info.restored_mode,screen_info.release_error);
-    printf("installed_mode=%u bios_kb=%u\n",screen_info.installed_mode,screen_info.bios_kb);
+    printf("installed_mode=%u bios_kb=%u viewport_word=%u\n",screen_info.installed_mode,screen_info.bios_kb,screen_info.viewport_word);
     printf("rows=%u installed=%u restored=%u scanline=%u\n",screen_info.old_rows,screen_info.installed_rows,screen_info.restored_rows,screen_info.installed_scanline);
     if(file>=0)close(file);
     free(offsets);free(packet);

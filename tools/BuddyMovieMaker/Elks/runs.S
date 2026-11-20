@@ -1,6 +1,7 @@
 /* First-party DOS CgaRuns adapted to ELKS ia16 regparmcall. GPL-3.0.
  * Input AX points to a fully validated WZR1 command stream, exactly 8000
  * cells. Hardware interrupts remain enabled. Poll after each 512 cells. */
+#include "backend.h"
 .code16
 .text
 .global render_cga_packet
@@ -14,11 +15,11 @@ render_cga_packet:
  mov %ax,%si
  mov $0xb800,%ax
  mov %ax,%es
- xor %di,%di
+ mov $BUDDY_CGA_START,%di
  mov $512,%bx
  cld
 .Lcommand:
- cmp $16000,%di
+ cmp $BUDDY_CGA_END,%di
  jae .Ldone
  lodsw
  mov %ax,%dx

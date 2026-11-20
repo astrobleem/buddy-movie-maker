@@ -97,7 +97,7 @@ int stop_requested(void)
 }
 int screen_open(void)
 {
-    static const unsigned char regs[16]={113,80,90,10,127,6,100,112,2,1,32,0,0,0,0,0};
+    static const unsigned char regs[16]={113,80,90,10,127,6,100,112,2,1,32,0,0,BUDDY_CGA_START/2,0,0};
     struct termios term;unsigned bx=0,ax,i;
     screen_error="local console unavailable";
     console=open("/dev/tty1",O_RDWR|O_NONBLOCK);
@@ -172,6 +172,9 @@ int screen_open(void)
     fill_cells(0,8000,0);
     outbyte(0x3d8,9);
     screen_info.installed_mode=3;
+    /* Start-address readback is not portable on 6845 variants. Report
+     * the programmed offset; native framebuffer captures verify the view. */
+    screen_info.viewport_word=BUDDY_CGA_START/2;
     screen_info.installed_rows=crt(6);
     screen_info.installed_scanline=crt(9);
     screen_error="";return 1;
@@ -191,13 +194,6 @@ void screen_close(void)
     if(locked){if(ioctl(console,DCREL_GRAPH,(void *)0)<0)screen_info.release_error=1;locked=0;}
     if(term_saved){if(tcsetattr(console,TCSAFLUSH,&saved)<0)screen_info.release_error=1;term_saved=0;}
     close(console);console=-1;
-}
-/* Stock bioshd's spin_timer() writes/clears character 79 even with the
- * console graphics lock held. Restore that glyph after completed file I/O;
- * preserve its movie attribute. Never write video before acquiring it. */
-void screen_after_io(void)
-{
-    if(changed&&!vga)video[158]=0xde;
 }
 /* Same 160x100 pixels, doubled to 320x200 in VGA's separate framebuffer.
  * WZR1 high nibble is left, low nibble right; input bytes never change. */
@@ -239,13 +235,13 @@ int render_packet(const unsigned char *commands)
 }
 void fill_cells(unsigned cell,unsigned count,unsigned char value)
 {
-    unsigned off=cell*2,word=0xde|((unsigned)value<<8);
+    unsigned off=BUDDY_CGA_START+cell*2,word=0xde|((unsigned)value<<8);
     __asm__ volatile("push %%es\n\tmov %%dx,%%es\n\tcld\n\trep stosw\n\tpop %%es"
         : "+D"(off),"+c"(count) : "a"(word),"d"(0xb800) : "cc","memory");
 }
 void copy_cells(unsigned cell,unsigned count,const unsigned char *source)
 {
-    unsigned off=cell*2+1;
+    unsigned off=BUDDY_CGA_START+cell*2+1;
     while(count--){video[off]=*source++;off+=2;}
 }
 int snapshot(const char *path)
@@ -256,7 +252,7 @@ int snapshot(const char *path)
     if(fd<0)return 0;
     while(off<(vga?64000U:16000U)){
         n=(vga?64000U:16000U)-off;if(n>sizeof(buf))n=sizeof(buf);
-        for(i=0;i<n;i++)buf[i]=video[off+i];
+        for(i=0;i<n;i++)buf[i]=video[off+i+(vga?0:BUDDY_CGA_START)];
         got=write(fd,buf,n);
         if(got!=(int)n){close(fd);return 0;}
         off+=n;
