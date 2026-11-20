@@ -141,6 +141,7 @@ done:
     printf("read_ms=%lu validate_ms=%lu draw_ms=%lu\n",read_ms,check_ms,draw_ms);
     printf("max_read_ms=%lu max_service_gap_ms=%lu\n",max_read,max_poll);
     printf("mode=%u restored=%u release_error=%d\n",screen_info.old_mode,screen_info.restored_mode,screen_info.release_error);
+    printf("installed_mode=%u bios_kb=%u\n",screen_info.installed_mode,screen_info.bios_kb);
     printf("rows=%u installed=%u restored=%u scanline=%u\n",screen_info.old_rows,screen_info.installed_rows,screen_info.restored_rows,screen_info.installed_scanline);
     if(file>=0)close(file);
     free(offsets);free(packet);

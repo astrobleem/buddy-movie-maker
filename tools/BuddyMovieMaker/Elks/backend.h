@@ -3,6 +3,7 @@
 #define BUDDY_ELKS_BACKEND_H
 struct screen_info {
     unsigned old_mode, old_rows, installed_rows, installed_scanline;
+    unsigned installed_mode,bios_kb;
     unsigned restored_mode, restored_rows;
     int release_error;
 };

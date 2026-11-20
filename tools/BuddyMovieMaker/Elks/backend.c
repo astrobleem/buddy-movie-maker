@@ -89,9 +89,15 @@ int screen_open(void)
     if((ax&255)==0x1a&&(bx&255)!=2)goto bad; /* DCC 2 is CGA. */
     bx=0xff10;bios(0x1200,&bx);
     if(!(bx&0xff00)&&(bx&255)<=3)goto bad; /* EGA */
-    /* These shared-RAM machines need separately certified kernel layouts.
-     * This stock-kernel proof deliberately does not assume those reservations. */
-    if(*FAR(0xfc00,0)==0x21||*FAR(0xf000,0xfffe)==0xfd)goto bad;
+    screen_error="PCjr shared-memory layout is unsupported";
+    if(*FAR(0xfc00,0)!=0x21&&*FAR(0xf000,0xfffe)==0xfd)goto bad;
+    if(*FAR(0xfc00,0)==0x21){
+        /* Stock ELKS uses INT12 at boot. Keep Tandy's existing 16K text
+         * page; never switch to 32K mode 9 after those pages became live. */
+        screen_info.bios_kb=*FAR(0x40,0x13)|((unsigned)*FAR(0x40,0x14)<<8);
+        screen_error="Tandy CGA100 requires BIOS-reserved top 16K (INT12 <= 624K)";
+        if(screen_info.bios_kb>624||screen_info.bios_kb<128)goto bad;
+    }
     term=saved;
     term.c_lflag&=~(ECHO|ECHONL|ICANON|ISIG|IEXTEN);
     term.c_iflag&=~(ICRNL|INLCR|IGNCR|ISTRIP|IXON|IXOFF|BRKINT);
@@ -108,6 +114,7 @@ int screen_open(void)
     outbyte(0x3d9,0);
     fill_cells(0,8000,0);
     outbyte(0x3d8,9);
+    screen_info.installed_mode=3;
     screen_info.installed_rows=crt(6);
     screen_info.installed_scanline=crt(9);
     screen_error="";return 1;
